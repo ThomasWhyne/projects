@@ -1,0 +1,79 @@
+<style lang="stylus">
+    .vplayer-container{
+  position: relative;
+  width:100%;
+  height: 100%;
+}
+.vplayer-container__cover{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 1.8%;
+}
+.vplayer-container__duration{ 
+  position: absolute;
+  right: 0;
+  margin-top: 5rpx;
+  padding:3rpx 5rpx;
+  border-radius: 5rpx;
+  color: rgb(231, 220, 220);
+  background-color: rgba(0, 0, 0, .3);
+  font-size: 18rpx;
+  font-style: monospace;
+}
+.vplayer-container__playicon{
+  position: absolute;
+  width: 10%;
+  height: 20%;
+  /* background-color: aqua; */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+.vplayer-container__playicon--loop{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFIAAABSCAMAAADw8nOpAAABQVBMVEUAAAAAAAAAAADatorVsodZSjlKPi8ZFRBeTjvXtIivkm5KPi8kHhbXs4jatopANimkiWjatooZFBDatorNrIKKdFhPQjINCwnatorKqICWfV6tkG2miml+aVBuW0Xatoratoratoqwk2/KqIDatoratorAoXq+nnjOrILatorLqYBnVkHatoqagWFoVkE+MyfatorRroTatorVsoa6m3Xatop9aE+4mXS0lnKehGSYf2CXfmBzYElfTzzatootJhzatoratoratoratoratooHBgQDAgLSr4W7nHaZgGGSel1vXUahh2aGb1R4Y0s2LSLatoqvkm6mimmylHHatorMq4HHpn7FpHzatoq9nngvJx10YUplVEArJBvatoratoratooUEAzMq4Gdg2Tatoqcg2PEo3yOdlqOdlnatoratoo2UiesAAAAanRSTlObAFn79HmzYLv5unJk/L2wr62jbPaXtVzq39S4sY+FNCUbvfTz7+7r6OLivqWlgW1h7Jj56MvIxMGpo6OIfXpnPhYSkotbWvnq19LCq5WKalri3b6f5dzZ2MypiX9mW08MoebZ19fW0JqPY0B3nAAABPNJREFUWMOklelaGjEYhTMMIKBFFhEQkUVBURAQUWQHccel1r2ubZ8u5/4voJlk8ggWZgZ6/kEmb5LvnC8hko4iuY67mErIkBOporuTi0h60kRGve5EsJQJ17JTfpN/KlsLZ0rBhNsbHRPZ8havQ+Ep00dNhUPXRW9rdGTELYcspmGyhGR3ZDRkxHnj85u05PfdOCPGkbE0fCZ9+ZCOGUR6Ezv7JiPa30l4jSBjTkdfDScWynHxhyVeXpjoq6nDGdNFNgPd3imuWxmAmTMtZgDyrat3yW6gqYP0yuH3tFSC4KJMQWQKVt6zFZa9msiOY1J82phXCYfHnxQmI346PlTXmG+IDycdHQ3khkNUyt+1g6pwNEsIsSpMn0K0Kr+OCqCyd/2i2o6NYUhKFCtXV0CVtBEqlQlG5LIlQbVSFZ9T5mBkXRAn4qBaVjYomAojSYlCs8ug+jIhmPWByGdk1eKsApixkT6dfD8hfbLNAFhVS5/F8wBkU37kw+uKLXMeoifPnGLTOp/0KDf/QbZTp3zwTPFljRjRmuLSGZ92mmp/RLpdfGiBOnFgJcZkPaCeLfCJLvcH5MU2H6jZgcVpYlTTi4C9xqduX/Qh24F17oyZGkOJxpnUJPMk9yDQ7kX+mefpoV4XKHEUZoH6zrM0v9uDjMq8E+IAZslomgUQ5x0nR9+R6Qr776uG19q+c9sraYGkm9xjx84Dc2R0zQF5dvQ9OSqQu2UeA2q2ZwzkG7WdR7C8qyJfl9ga53bARsaRDbCfs3MuvXJkrsSWCAHLZDwtAyHGKOU40sny/2TXcFvfdfsT6z0nQ7a4ORkgScZVEshwg1oUKc79bXglty639Ku5IrqSItPsCrIAM8OIAD7r9NQMwN7N3xsKMsXMcg3P5CYUHellk/V09o4iY3m24yAw7EoD16FWwqxAkHHyMYm83LM3GwDRRgKXGo0AgL3t9y8SqbMNV4FNXSQWh9u0CVRZAesSufKxVgKOdZFaNv0CdhSQ70oiPOhx4EQXqWXTGrDNLmKnRH6wO/knYNVDatpkBW7Zu3AnkUBDDfqDHlLTpgc17I2ARPg1lAc8RpED70APYOaXkUTA4mQG3gwjB7YuIDMSBBIA+V+kShIH/9uc+bM0DAZhHBQMtB1irWAhSyFDKQStzVIoyVBIcZQULHQW1O//AQyJ5y8GXy59r4gdOnQ4mty/5/nd5UkhJ2PnvwxiSU/14GNDeniX+Z0U0ZyM+xQRGR8epNT71+Wrc268SKnvb+ker4ake6Qhs7B/j08YG64eDzMZbuokIi3uSSTDbbZU5yVp0eflclYvCmWqp6RFner3B9ZZJLvHZ52xe972LN16Q7piPpMWZUNWSxdpMPdTROxxkQYImARJ5CWKEgRMJbPKs2mi8gExaFduiEEkq1FfIlkR1nYVXFTCGvlv1urIf0yK2VFgUurvbXgG3xNuO4bP6M4wfNhSq4fElmKejU43vHZYfD8/jsXvgggDNQBEdHCJN9sAl3ShjjeBGWQKegrKEznR4FEHZMdeNOv4BdPqiCrGCxrmtnu6+oW57RrmFgjGe+8JG/No9VF/0h9kMG1+XEU5sFFFomv45cLBLxfwy3WNRFVwO4SyRlOJ+B1zGkFZhwJuNbwct/HyaJO0WHCyGbXxcnzz1xDcjurtB4V/cPboHmeKi8JwnLGekD4BpeaybbATUggAAAAASUVORK5CYII=');
+  background-size: contain;
+  background-repeat: no-repeat;
+
+}
+</style>
+
+<template>
+    <view class='vplayer vplayer-container' bindtap='onPlay'>
+        <image class='vplayer-container__cover' src="{{v_cover}}"></image>
+        <text class='vplayer-container__duration'>{{v_duration}}</text>
+        <view class='vplayer-container__playicon'>
+            <text class='vplayer-container__playicon--loop' hidden='{{isImg}}'></text>
+        </view>
+</view>
+</template>
+
+<script>
+import wepy from "wepy"
+export default class Vplayer extends wepy.component {
+    props={
+        isImg:{
+            type:Boolean,
+            default:false
+        },
+        v_cover:{
+            type:String,
+            default:''
+        },
+        v_duration:{
+            type:String,
+            default:'00:58'
+        }
+    }
+    methods={
+        onPlay(){
+
+        }
+    }
+}
+</script>
+
+

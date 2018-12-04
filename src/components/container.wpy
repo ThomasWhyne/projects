@@ -1,0 +1,176 @@
+<style lang="stylus">
+    @import "./../common/container__bg.styl"
+    .container-sidenav
+        position absolute
+        width 70%
+        height 100vh
+        background-color aqua
+        left -70%
+        transition all .4s
+        z-index 2
+        background-image url(bg_1)
+        background-size cover
+        background-repeat no-repeat
+    .container-sidenav--in
+        left 0
+    .container-mask
+        position absolute
+        display none
+        width 100%
+        height 100vh
+        right 0
+        top 0
+        background-color black
+        transition all .4s
+    .container-mask--in
+        display block
+        z-index 1
+    .container-page
+        width 100%
+        position absolute
+        left 0
+        transition all .4s
+    .container-page--out
+        left 70%
+
+</style>
+
+<template>
+    <view class="container-sidenav {{shift?'container-sidenav--in':''}}" style="{{shiftStyle}}" @touchmove="onTouchMove" @touchend="onTouchEnd">
+        <view class="container-userinfo">
+            <view class="container-userinfo__qrcode"></view>
+            <view class="container-userinfo__avatar">
+                <text class="container-userinfo__settag"></text>
+                <image src="https://q4.qlogo.cn/g?b=qq&k=oJrFtCuotoicerMypMmurIQ&s=140&t=1439899557"></image>
+                <text class="container-userinfo__cover"></text>
+            </view>
+            <view class="container-userinfo__arrow"></view>
+            <view class='container-userinfo__detail'>
+                <view class='container-userinfo__nickname'>
+                    <text>并非阿伦</text>
+                    <text>Lv3</text>
+                    <text></text>
+                </view>
+                <view class='container-userinfo__signature'>
+                    <text>打死不玩上单(￣▽￣)</text></view>
+                </view>
+                <view class='container-userinfo__checkinfo'>
+                    <view class='container-userinfo__focuses'>
+                    <navigator>
+                        <text>6</text>
+                        <text>关注</text>
+                    </navigator> 
+                    </view>
+                    <view class='container-userinfo__fans'>
+                    <navigator>
+                        <text>0</text>
+                        <text>粉丝</text>
+                    </navigator> 
+                    </view>
+                    <view class='container-userinfo__buddies'>
+                    <navigator>
+                        <text>0</text>
+                        <text>好友</text>
+                    </navigator> 
+                    </view>
+                    <view class='container-userinfo__posts'>
+                    <navigator>
+                        <text>37</text>
+                        <text>发表</text>
+                    </navigator> 
+                    </view>
+                </view>
+            </view>
+            <view class='container-userinfo__activities'>
+                <navigator class='container-userinfo__related'>
+                    <text></text>
+                    <text>与我相关</text>
+                </navigator>
+                <navigator class='container-userinfo__center'>
+                    <text></text>
+                    <text>活动中心</text>
+                </navigator>
+                <navigator class='container-userinfo__orders'>
+                    <text></text>
+                    <text>我的订单</text>
+                </navigator>
+                <navigator class='container-userinfo__missions'>
+                    <text></text>
+                    <text>我的任务</text>
+                </navigator>
+                <navigator class='container-userinfo__collected'>
+                    <text></text>
+                    <text>我的收藏</text>
+                </navigator>
+            </view>
+            <view class='container-userinfo__footer'>
+                <navigator>
+                    <text>۞</text>
+                </navigator>
+                <navigator>
+                    <text>✚</text>
+                </navigator>
+            </view>
+        </view>
+    </view>
+    <view class="container-mask {{shift?'container-mask--in':''}}" style="opacity:{{shif_mask_opacity}};" @tap.stop="onMaskTap"></view>
+    <view class="container-page {{shift?'container-page--out':''}}" style="{{shiftStyle}}">
+        <slot name="container"></slot>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy"
+const defaultStyle="transform:translate3d(0,0,0);";
+export default class Container extends wepy.component {
+    props={
+        shift:{
+            type:Boolean,
+            default:false
+        }
+    }
+
+    data={
+        isDraged:false,
+        startX:0,
+        slideWidth:0.7,
+        shiftStyle:defaultStyle,
+        shif_mask_opacity:0.4
+    }
+
+    methods={
+        onMaskTap(){
+            this.$emit('togglePageShift');
+        },
+        onTouchMove(e){
+            if(!this.isDraged)this.startX=this.getShiftPosition(e).currentX;
+            this.isDraged=true;
+           let { currentX, shiftX }=this.getShiftPosition(e);
+            if(this.startX<currentX)return;
+            this.setShiftStyle(shiftX);
+        },
+        onTouchEnd(e){
+            this.shiftStyle=defaultStyle;
+            if(this.shifPercent>0.6)this.$emit('togglePageShift');
+        }
+    }
+    getShiftPosition(e){
+        let currentX=e.changedTouches[0].pageX;
+        let shiftX=Math.min(this.slideWidth,Math.abs(currentX-this.startX));
+        return { currentX, shiftX };
+    }
+    setShiftStyle(shifX){
+        this.shifPercent=shifX/this.slideWidth;
+        this.shiftStyle=`transition-duration: 0s;transform:translate3d(-${Math.pow(shifX,0.8)}px,0,0);`;
+        this.shift_mask_width=this.maskWidth+Math.pow(shifX,0.8);
+        this.shif_mask_opacity=Math.max(0.2, 0.7-this.shifPercent);
+    }
+    async onLoad(){
+        let { windowWidth }=await wepy.getSystemInfo();
+        this.slideWidth=this.slideWidth*windowWidth;
+    }
+
+}
+</script>
+
+

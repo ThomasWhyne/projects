@@ -1,0 +1,171 @@
+<style lang="stylus">
+    @import "../common/detail__bg.styl";
+    .detail-commnet__main
+        display flex
+        min-height 172rpx
+        margin 10rpx auto 
+        border-bottom 1rpx solid #ececec
+        // background-color aqua
+    .detail-comment__avatar
+        flex-basis w=80rpx
+        margin-right 10rpx
+        margin-left 10rpx
+        text-align center
+        // background-color teal
+        image
+            width w*0.8
+            height w*0.8
+            border-radius w*0.8
+            // background-color red  
+            margin-top 10rpx
+    .detail-comment__bd
+        flex 1
+        height 100%
+        margin-bottom 10rpx
+        // background-color aliceblue
+    .detail-comment__userinfo
+        display flex
+        height 50%
+        margin-bottom 5rpx
+        // background-color pink
+    .detai-comment__userinfo-desc
+        flex-basis 80%
+        height 100%
+        // background-color grey
+    .detail-comment__userinfo--nickname
+        height 60%
+        font-size 27rpx
+        color #416a74
+        // background-color #4562d5 
+    .detail-comment__userinfo--ranks
+        height 40%
+        text
+            display inline-block
+            height 22rpx
+            font-size 18rpx
+            box-sizing border-box
+            padding 2rpx
+            vertical-align middle
+            border-radius 3rpx
+            margin 0 5rpx 15rpx 5rpx
+            background-color #ececec
+            color #c2baa8
+            &:nth-child(1)
+                width 22rpx
+                // background-color green
+                background-image url(gender_male)
+                background-repeat no-repeat
+                background-size 16rpx 16rpx
+                background-position center center
+            &:nth-child(3)
+                color #899697
+                background-color transparent   
+    .detail-comment__userinfo-likebtn
+        flex 1
+        display flex
+        align-items center
+        justify-content center
+        height 100%
+        text
+            font-size 18rpx
+            margin 5rpx
+            color #a3b3b7
+            &:nth-child(2)
+                width 40rpx
+                height 40rpx
+                background url(before_liked) no-repeat 
+                background-position center
+                background-size contain
+    .detail-comment__content
+        height 50%
+        text
+            max-width 90%
+            text-align justify
+            line-height 1.5
+            word-break break-all
+            box-sizing border-box
+            font-size 25rpx
+            display -webkit-box
+            -webkit-box-orient vertical
+            -webkit-line-clamp 4
+            text-overflow ellipsis
+            overflow hidden
+        i
+            font-size 25rpx
+            padding 3rpx
+            border-radius 3rpx
+            color #af883c
+            background-color #e3e3e3
+    .detail-comment__content--spread
+        text
+            display block
+</style>
+
+<template>
+    <view wx:for="{{comment_list}}" wx:key="index" class="detail-commnet__main">
+            <view class="detail-comment__avatar"><image src="{{item.game_data.logo_url}}"></image></view>
+                <view class="detail-comment__bd">
+                    <view class="detail-comment__userinfo">
+                        <view class="detai-comment__userinfo-desc">
+                            <view class="detail-comment__userinfo--nickname">{{item.game_data.nick}}</view>
+                            <view class="detail-comment__userinfo--ranks">
+                                <text></text>
+                                <text>{{item.game_data.tier}}</text>
+                                <text>2小时前</text>
+                            </view>
+                        </view>
+                        <view class="detail-comment__userinfo-likebtn">
+                            <text>{{item.favour_num}}</text>
+                            <text @tap="onToggleLiked({{index}},{{item.comment_id}})"></text>
+                        </view>
+                    </view>
+                    <view class="detail-comment__content {{item.spreaded?'detail-comment__content--spread':''}}">
+                        <text >{{item.content}}</text>
+                        <block wx:if="{{item.content.length>100}}">
+                            <i @tap="onToggleSpread({{index}})">全文</i>
+                        </block>
+                    </view>
+            </view>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy"
+export default class Comment extends wepy.component {
+    props={
+        comment_list:{
+            type:Array,
+            default:[]
+        }
+    }
+    data={
+    }
+    methods={
+        onToggleSpread(index){
+            let [ comment ]=this.setSpread(index);
+            this.comment_list[index]=comment;
+            // this.comment_list[index].spreaded=!this.comment_list[index].spreaded;
+            this.$apply();
+        },
+        onToggleLiked(index,comment_id){
+            let comment={ 
+                index,
+                comment_id
+            };
+            this.$emit("likeToggled",comment);
+        }
+    }
+    setSpread(index){
+        return this.comment_list.filter((cmt,idx)=>{
+            if(idx===index){
+                cmt.spreaded=!cmt.spreaded;
+                return cmt
+            }
+        })
+    }
+    getComment(index){
+        return 
+    }
+}
+</script>
+

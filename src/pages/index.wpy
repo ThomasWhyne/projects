@@ -1,0 +1,356 @@
+<style lang="stylus" scoped>
+    .container-nav
+        height 110rpx
+    .container-main
+        width 100%
+        min-height 100vh
+        overflow scroll
+    ::-webkit-scrollbar
+        display none
+    .container-content
+        overflow scroll
+    .container__section-article
+        height 180rpx
+        display flex
+        border-bottom 1rpx solid #e6e6e6
+    .container__article--header
+        width 70%
+        height 100% 
+    .container__article--title
+        margin 30rpx
+        font-size 30rpx
+    .container__article--desc
+        margin-top 25rpx
+        margin-left 30rpx
+        font-size 26rpx
+        color #34474a
+        text 
+            margin-right 25rpx
+            color #97a9ac
+    .container__article--thumb
+        width 30%
+        height 100%
+        image 
+            width 150rpx
+            height 120rpx
+            border-radius 7rpx
+            margin-top 30rpx
+            margin-left 30rpx
+    .container__section-video
+        height 534rpx
+        border-bottom 1rpx solid #e6e6e6
+        overflow hidden
+    .container__video--vtitle
+        margin 2.5%
+        font-size 30rpx
+    .container__video--vbody
+        position relative
+        width 95%
+        height 70%
+        left 2.5%
+        border-radius 5rpx
+        background-color red
+    .container__video--vdesc
+        width 90%
+        margin 2.5% 0 2.5% 2.5%
+        display flex
+        justify-content space-between
+        text
+            margin-right 15rpx
+            vertical-align middle
+    .container__vdesc-count
+        flex-basis 70%
+        font-size 25rpx
+        padding 5rpx
+        color #97a9ac
+    .container__vdesc-switch
+        flex-basis 30%
+        font-size 30rpx
+        text-align right
+        color #26a9a2
+    .container__section-activity
+        width 100%
+        height 387rpx
+        scroll-view
+            display flex
+            flex 1
+            white-space nowrap
+    .container__section--activity__title
+        height 25%
+        display flex
+        align-items center
+        justify-content space-between
+        background-color teal
+        padding 0 29rpx
+    .container__section--activity__scroller
+        display inline-block
+        margin 29rpx 0 0 29rpx
+        image
+            height 134rpx
+            width 240rpx
+            margin-bottom 10rpx
+            border-radius 13rpx
+            background-color red
+    .container__section--activity__scroller-name
+        color #34474a
+    .container__footer
+        text-align center
+        height 75rpx
+        background-color #d7e9e8
+        color #357e84
+        font-size 24rpx
+        line-height 75rpx
+         
+</style>
+
+<template>
+    <container :shift.sync="shift">
+        <view slot="container">
+            <view class="container-nav">
+                <navbar :tabList="tabList" :currentTab.sync="currentTab"></navbar>
+            </view>
+            <refresher>
+                <swiper class="container-main" current="{{ currentIndex }}" @change="onSwiperChange">
+                        <swiper-item class="container-content">
+                            <view class="container__search">
+                                <searchbar></searchbar>
+                            </view>
+                            <view class="container__banner">
+                                <banner :bannerList="bannerList"></banner>
+                            </view>
+                            <view class="container__section">
+                                <block wx:for="{{recommand_list}}" wx:key="index">
+                                    <navigator open-type='navigateTo' url='./detail?id={{item.article_id}}'>
+                                        <view class='container__section-article'>
+                                                <view class='container__article--header'>
+                                                    <view class='container__article--title'>{{item.title}}</view>
+                                                    <view class='container__article--desc'>
+                                                        <text>{{item.author}}</text>
+                                                    </view>
+                                                </view>
+                                                <view class='container__article--thumb'>
+                                                    <image src='{{item.image_url_small}}' mode=" aspectFill" lazy-load="{{true}}"></image>
+                                                </view>
+                                        </view>
+                                    </navigator>
+                                    <!-- 视频播放组件放置区 -->
+                                        <block wx:if="{{index==4}}">
+                                            <view class='container__section-video'>
+                                                <view class='container__video--vtitle'><text>乐芙兰-源计划皮肤效果展示</text></view>
+                                                <view class='container__video--vbody'>
+                                                    <vplayer></vplayer>
+                                                </view>
+                                                <view class='container__video--vdesc'>
+                                                    <view class='container__vdesc-count'>
+                                                        <text>短视频</text>
+                                                        <text>2.7万播放</text>
+                                                    </view>
+                                                    <view class='container__vdesc-switch'>
+                                                        <text></text>
+                                                        <text>换一个</text>
+                                                    </view>
+                                                </view> 
+                                            </view> 
+                                        </block>
+                                    <!-- 视频播放组件放置区 -->
+                                    <!-- 滚动活动栏放置区 -->
+                                        <block wx:if="{{index==7}}">
+                                            <view class='container__section-activity'>
+                                                <view class='container__section--activity__title'>
+                                                <view><text>活动中心</text></view>
+                                                <view><text>10个</text><text>》</text></view>
+                                                </view>
+                                                <scroll-view scroll-x>
+                                                    <view class='container__section--activity__scroller'>
+                                                        <image></image>
+                                                        <view class='container__section--activity__scroller-name'><text>K/DA最新资讯</text></view>
+                                                        <view class='container__section--activity__scroller-time'><text>5天后结束</text></view>
+                                                    </view>
+                                                    <view class='container__section--activity__scroller'>
+                                                        <image></image>
+                                                        <view class='container__section--activity__scroller-name'><text>K/DA最新资讯</text></view>
+                                                        <view class='container__section--activity__scroller-time'><text>5天后结束</text></view>
+                                                    </view>
+                                                    <view class='container__section--activity__scroller'>
+                                                        <image></image>
+                                                        <view class='container__section--activity__scroller-name'><text>K/DA最新资讯</text></view>
+                                                        <view class='container__section--activity__scroller-time'><text>5天后结束</text></view>
+                                                    </view>
+                                                </scroll-view>
+                                            </view>
+                                        </block>
+                                    <!-- 滚动活动栏放置区 -->
+                                </block>
+                            </view>
+                            <view class="container__footer">点击刷新，查看更多内容  </view>
+                        </swiper-item>
+                </swiper>
+            </refresher>
+        </view>
+    </container>
+</template>
+
+<script>
+import wepy from "wepy"
+import Navbar from "@/components/navbar" 
+import Refresher from "@/components/refresher"
+import Searchbar from "@/components/searchbar"
+import Container from "@/components/container"
+import Banner from "@/components/banner"
+import Vplayer from "@/components/vplayer"
+wx.cloud.init();
+const db=wx.cloud.database();
+const recommand_list=db.collection('recommand_list');
+const user_list=db.collection("user_list");
+
+export default class Index extends wepy.page {
+    config={
+    }
+    data={
+        shift:false,
+        tabList:[{ key: 'tab1', title: '推荐',desc:'recom' },
+            { key: 'tab2', title: '赛事', desc: 'match' },
+            { key: 'tab3', title: '视频', desc: 'video' },
+            { key: 'tab4', title: '版本', desc: 'meta' },
+            { key: 'tab5', title: '英雄', desc: 'champ' }
+        ],
+        currentTab:'tab1',
+        currentIndex:0,
+        bannerList: [{
+            adId: '10229419',
+            actionID: '229419',
+            Fname: '太空秘宝',
+            bannerId: '16601',
+            popWidth: '780',
+            popHeight: '330',
+            imgUrl: '//ossweb-img.qq.com/upload/adw/image/20180914/967f5b7eec840227b5026894756d6bfb.jpg',
+            adUrl: 'http://lol.qq.com/act/lbp/a20180913OdysseyAdventure/index.html?e_code=438840&idataid=229419',
+            beginTime: '2018-09-14 11:49:45',
+            endTime: '2018-09-26 23:59:00',
+            ecode: '438840',
+            ad_memo: '',
+            type: '1',
+            isBottom: '1',
+            data_vesion: ''
+            },
+            {
+                adId: '10229714',
+                actionID: '229714',
+                Fname: '7周年战斗之夜',
+                bannerId: '16602',
+                popWidth: '780',
+                popHeight: '330',
+                imgUrl: '//ossweb-img.qq.com/upload/adw/image/20180920/01c236737f9d7171d2c6cb303f3ad27b.jpg',
+                adUrl: 'http://lol.qq.com/act/a20180815fighting/?e_code=439202&idataid=229714',
+                beginTime: '2018-09-17 11:02:00',
+                endTime: '2018-09-23 23:59:00',
+                ecode: '439202',
+                ad_memo: '',
+                type: '1',
+                isBottom: '1',
+                data_vesion: ''
+            },
+            {
+                adId: '10229330',
+                actionID: '229330',
+                Fname: '星海浩瀚无畏扬帆',
+                bannerId: '16603',
+                popWidth: '780',
+                popHeight: '330',
+                imgUrl: '//ossweb-img.qq.com/upload/adw/image/20180913/9ee78d12742fc0d872bf03afc3a02f5f.jpg',
+                adUrl: 'http://lol.qq.com/act/a20180912odyssey/index.html?e_code=438706&idataid=229330',
+                beginTime: '2018-09-13 17:20:00',
+                endTime: '2018-10-13 23:59:00',
+                ecode: '438706',
+                ad_memo: '',
+                type: '1',
+                isBottom: '1',
+                data_vesion: ''
+            },
+            {
+                adId: '10230366',
+                actionID: '230366',
+                Fname: '战斗之夜邀请函',
+                bannerId: '16604',
+                popWidth: '780',
+                popHeight: '330',
+                imgUrl: '//ossweb-img.qq.com/upload/adw/image/20180922/772a4082e3b19ffa73f374f687c31488.jpg',
+                adUrl: 'http://lol.qq.com/act/a20180607wechatbinding/index.html?e_code=440147&idataid=230366',
+                beginTime: '2018-09-21 10:41:00',
+                endTime: '2018-09-24 23:59:00',
+                ecode: '440147',
+                ad_memo: '',
+                type: '1',
+                isBottom: '1',
+                data_vesion: ''
+            },
+            {
+                adId: '10230665',
+                actionID: '230665',
+                Fname: '玉剑传说限时销售',
+                bannerId: '16605',
+                popWidth: '780',
+                popHeight: '330',
+                imgUrl: '//ossweb-img.qq.com/upload/adw/image/20180922/704878dd7c293f613a58ca9ebb046ea8.jpg',
+                adUrl: 'http://lol.qq.com/act/a20180821presell/index.html?e_code=440541&idataid=230665',
+                beginTime: '2018-09-22 12:40:53',
+                endTime: '2018-09-24 23:59:00',
+                ecode: '440541',
+                ad_memo: '',
+                type: '1',
+                isBottom: '1',
+                data_vesion: ''
+            }],
+        recommand_list:[]
+    }
+    components={
+        navbar:Navbar,
+        refresher:Refresher,
+        searchbar:Searchbar,
+        container:Container,
+        banner:Banner,
+        vplayer:Vplayer
+    }
+    methods={
+        onSwiperChange(e){
+            const index =e.detail.current;
+            this.swiperChanged(index,"swiper");
+        }
+    }
+    events={
+        "onPageRefresh":(name,call)=>{
+            ((name,call)=>setTimeout(()=>{
+                    this.$invoke(name,call);
+                },2000))(name,call)
+        },
+        'togglePageShift':()=>{
+            this.shift=!this.shift;      
+        },
+        "tabChanged":(currentTab)=>{
+            const tabs=this.tabList;
+            const index=tabs.findIndex(tab=>tab.key===currentTab);
+            if(this.currentIndex===index)return;
+            this.swiperChanged(index);
+        }
+    }
+    swiperChanged(index,source){
+        if(source)this.currentTab=this.tabList[index].key;
+        this.currentIndex=index;
+        this.$apply();
+    }
+    async onReady(){
+
+    }
+    async onLoad(){
+        let { data }=await recommand_list.limit(10).get();
+        this.recommand_list=data;
+        this.$apply();
+        // .then(res=>{
+        //     this.recommand_list=res.data;
+        //     this.$apply();
+        //     console.log(this.recommand_list)
+        //  })
+    }
+}
+</script>
+

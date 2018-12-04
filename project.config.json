@@ -1,0 +1,13 @@
+{
+  "description": "Wepy_Stylus_wxCloud",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wx12d76d61400f8a4d",
+  "projectname": "handylol",
+  "miniprogramRoot": "./dist"
+}

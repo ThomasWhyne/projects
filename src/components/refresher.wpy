@@ -1,0 +1,221 @@
+<style lang="stylus">
+    @import "./../common/refresher__bg.styl"
+    vendors=official 
+    background(n)
+        background-image url(n)
+    .refresher
+        position absolute
+        top -120rpx
+        right 0
+        left 0
+        overflow hidden
+        margin auto
+        height 100rpx
+    .refresher--invisible
+        visibility hidden
+    .refresher--visible
+        visibility visible
+        z-index -1
+    .refresher__content
+        position absolute
+        bottom 10rpx
+        left 0
+        width 100%
+        color #666
+        text-align center
+        font-size 60rpx
+    .refresher__content--text
+        bottom 0
+    .refresher__text--pulling
+    .refresher__text--released  
+        font-size 32rpx
+        line-height 32rpx
+    .refresher__text--released
+        display none
+    .refresher__icon--pulling
+        backface-visibility hidden
+        transform-style preserve-3d
+        padding 14rpx 0
+    .refresher__icon--released
+        width 100%
+        backface-visibility hidden
+        transform-style preserve-3d
+        padding 14rpx 0
+        display none
+        animation-duration 1.5s
+    .refresher__icon--poro-static
+        display block
+        margin 0 auto
+        width 54rpx
+        height 62rpx
+        background-repeat no-repeat
+        background-position center center
+        background-size 54rpx 64rpx
+        background poro_0
+    .refresher__icon--poro-animated
+        display block
+        margin 0 auto
+        width 54rpx
+        height 62rpx
+        // here gose the poro animation
+        background poro_1
+        background-repeat no-repeat
+        background-position center bottom
+        background-size 54rpx 62rpx
+        animation-name capering_the_poro
+        animation-iteration-count infinite
+        animation-duration .7s
+        animation-timing-function step(7)
+    .refresher--active.refresher--refreshing
+            transition transform .2s
+            transform scale(1)
+            .refresher__icon--pulling
+            .refresher__text--pulling
+                display none
+            .refresher__icon--released
+            .refresher__text--released
+                display block
+            .refresher--refreshing-tail
+                transform scale(0)
+    @keyframes capering_the_poro {
+        16% {
+            background poro_2
+        }
+        32% {
+            background poro_3
+            width 70rpx 
+            height 80rpx
+        }
+        48%{
+            background poro_4
+            width 70rpx 
+            height 80rpx
+        }
+        64%{
+            background poro_5
+            width 70rpx 
+            height 80rpx
+        }
+        80%{
+            background poro_6    
+        }
+        100%{
+            background poro_7
+        }
+    }
+</style>
+
+<template>
+    <view style="{{style}}" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
+        <view class="refresher {{visible}}">
+            <view class="refresher__content refresher__content--text">
+                <view class="refresher__icon--pulling">
+                    <text class="refresher__icon--poro-static"></text>
+                </view>
+                <view class="refresher__text--pulling">{{pullingText}}</view>
+                <view class="refresher__icon--released">
+                    <text class="refresher__icon--poro-animated"></text>
+                </view>
+                <view class="refresher__text--released">{{releasedText}}</view>
+            </view>
+        </view>
+             <slot name=""></slot>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy"
+
+const defaultStyle = 'transition: transform .4s; transform: translate3d(0px, 0px, 0px) scale(1);';
+
+export default class Refresher extends wepy.component {
+    props={
+        pullingText:{
+            type:String,
+            default:'释放刷新'
+        },
+        releasedText:{
+            type:String,
+            default:'刷新中'
+        },
+
+
+    }
+    data={
+        style:defaultStyle,
+        visible:'refresher--invisible',
+        distance:100
+    }
+    methods={
+        onTouchStart(e){
+            const position=this.getTouchPostion(e);
+            this.start=position;
+            this.shiftX=this.shifY=0;
+            this.activate();
+        },
+        onTouchMove(e){
+            const position=this.getTouchPostion(e);
+            this.shiftX=position.x-this.start.x;
+            this.shifY=position.y-this.start.y;
+            if(this.shifY<0)return false;
+            this.shifY=Math.pow(this.shifY,0.8);
+            if(!this.activated && this.shifY > this.distance){
+                this.activated=true;
+                //this.$emit('cuntomevent');
+            }else if(this.activate && this.shifY < this.distance){
+                this.activated=false;
+            }
+
+            this.igniteShift(this.shifY);
+        },
+        onTouchEnd(e){
+            this.start=false;
+            if(this.shifY<=0 || this.isRefreshing())return false;
+            this.deactivate(e);
+            if(Math.abs(this.shifY)>=this.distance){
+                this.igniteRefresh();
+                this.$emit('onPageRefresh',this.$name,'terminateRefresh');
+            }
+        }
+    }
+    getTouchPostion(e){
+        return {
+            x:e.changedTouches[0].pageX,
+            y:e.changedTouches[0].pageY 
+        }
+    }
+    activate(){
+        this.visible="refresher--visible";
+    }
+    deactivate(e){
+        if(this.activated)this.activated=false;
+        this.style=defaultStyle;
+        this.visible="refresher--invisible";
+        this.$apply();
+    }
+    isRefreshing(){
+        return this.visible.indexOf('refresher--refreshing') !== -1;
+    }
+    igniteShift(shifY){
+        const style=`transition-duration: 0s; transform: translate3d(0, ${shifY}px, 0) scale(1);`;
+        const visible=this.shifY < this.distance ? "refresher--visible":"refresher--active";
+        this.style=style;
+        this.visible=visible;
+    }
+    igniteRefresh(){
+        this.style='transition: transform .4s; transform: translate3d(0, 70px, 0) scale(1);';
+        this.visible="refresher--active refresher--refreshing";
+    }
+    terminateRefresh(){
+        this.style="refresher--active refresher--refreshing refresher--tail";
+        setTimeout(()=>{
+            this.deactivate();
+        },200)
+    }
+    onLoad(){
+        this.activated=false;
+    }
+}
+</script>
+
+

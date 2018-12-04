@@ -1,0 +1,86 @@
+<style lang="stylus">
+    @import "../common/detail__bg.styl";
+    .detail-praise
+        width 100%
+        height 130rpx
+        display flex
+        align-items center
+        justify-content center
+        margin 20rpx 0
+    .detail-praise__wrapper
+        text-align center
+        text
+            font-size 20rpx
+            color #9aabab
+    .detail-praise__like
+    .detail-praise__like--after
+    .detail-praise__unlike
+    .detail-praise__unlike--after
+        width 70rpx
+        height 70rpx
+        border-radius 70rpx
+        margin 0 80rpx
+        border 2rpx solid #e3e3e3
+        background-size contain
+    .detail-praise__like
+        background-image url(before_praise)
+    .detail-praise__unlike
+        background-image url(before_dispraised)
+    .detail-praise__like--after
+        background-image url(after_praise)
+    .detail-praise__unlike--after
+        background-image url(after_dispraised)
+</style>
+
+<template>
+    <view class="detail-praise">
+        <block wx:if="{{!status}}">
+            <view class="detail-praise__wrapper" @tap="onFavored">
+                <view class="detail-praise__like"></view>
+                <text>{{favors}}</text>
+            </view>
+            <view class="detail-praise__wrapper" @tap="onUnfavored">
+                <view class="detail-praise__unlike"></view>
+                <text>{{unfavors}}</text>
+            </view>
+        </block>
+        <block wx:else>
+            <view class="detail-praise__wrapper">
+                <view class="detail-praise__like{{status==1?'--after':''}}"></view>
+                <text>{{favors}}</text>
+            </view>
+            <view class="detail-praise__wrapper">
+                <view class="detail-praise__unlike{{status==2?'--after':''}}"></view>
+                <text>{{unfavors}}</text>
+            </view>
+        </block>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+export default class Favored extends wepy.component{
+    props={
+        favors:{
+            type:Number,
+            default:0
+        },
+        unfavors:{
+            type:Number,
+            default:0
+        },
+        status:{
+            type:Number,
+            default:0
+        }
+    }
+    methods={
+        onFavored(){
+            this.$emit("favorsChanged",{inc:1,status:1})
+        },
+        onUnfavored(){
+            this.$emit("favorsChanged",{inc:1,status:2})
+        }
+    }
+}
+</script>

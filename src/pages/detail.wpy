@@ -1,0 +1,273 @@
+<style lang="stylus">
+    @import "../common/detail__bg.styl";
+    .detail-header
+        padding 10rpx 30rpx
+        font-size 37.5rpx
+        font-weight bold
+        text-align justify
+        text-rendering optimizeLegibility
+    .detail-info
+        display flex
+        justify-content space-between
+        padding 0 30rpx
+        text
+            display inline-block
+            font-size 27rpx
+            color #b3c0c3
+    .detail-authorsect
+        width 92.5%
+        height 120rpx
+        border 1rpx solid #e3e3e3
+        margin 50rpx 30rpx
+        box-sizing border-box
+        padding 0 20rpx
+        display flex
+        justify-content space-between
+        align-items center
+    .detail-authorsect__name
+        text
+            display block 
+            margin-left -200rpx
+            line-height 1.5  
+            &:nth-child(1)
+                font-size 30rpx
+                font-weight bold
+                color #cad6d5
+            &:nth-child(2)
+                font-size 20rpx
+                color #bea26d
+    .detail-authorsect__subscribe
+        width 82.5rpx
+        border 1rpx solid #bea26d
+        font-size 25rpx
+        line-height 1.5
+        text-align center
+        color #bea26d
+    .detail-authorsect__avatar
+        width 70rpx
+        height 70rpx
+        border-radius 70rpx
+        margin-right 5rpx
+        background-color aqua   
+    .detail-content
+        width 92.5%
+        padding 10rpx 30rpx
+        line-height 1.6
+    .detail-content__paras
+        display flex
+        justify-content center
+        margin 10rpx auto
+        font-size 27rpx
+        text-align justify
+    .detail-share
+        height 160rpx
+    .detail-share__title
+        height 30rpx
+        font-size 20rpx
+        text-align center
+        line-height 30rpx
+        position relative
+        color #889191
+        &::before
+            content ""
+            position absolute
+            width 42rpx
+            height 1rpx
+            background-color #b3c0c3
+            left 40%
+            bottom 15rpx
+        &::after
+            content ""
+            position absolute
+            width 42rpx
+            height 1rpx
+            background-color #b3c0c3
+            right 40%
+            bottom 15rpx
+    .detail-share__platform
+        height 130rpx
+        display flex
+        align-items center
+        justify-content center
+        view 
+            width 70rpx
+            height 70rpx
+            border-radius 70rpx
+            border 2rpx solid #e3e3e3
+            margin 0 30rpx
+            background-size contain
+            &:nth-child(1)
+                background-image url(share_wx)
+            &:nth-child(2)
+               background-image url(share_wxtimeline)
+            &:nth-child(3)
+                background-image url(share_qq) 
+    .detail-comment__header
+        height 50rpx
+        background-color #f0f4f8
+        padding-left 30rpx
+        font-size 23rpx
+        line-height 50rpx
+        color #889191
+</style>
+
+<template>
+    <view class="detail">
+        <view class="detail-header">{{article.title}}</view>
+        <view class="detail-info">
+            <text class="detail-info__author">{{article.author}}</text>
+            <text class="detail-info__date">{{article.publication_date}}</text>
+        </view>
+        <view class="detail-authorsect">
+            <view class="detail-authorsect__avatar"></view>
+            <view class="detail-authorsect__name">
+                <text>{{article.author}}</text>
+                <text>{{150}} 关注</text>
+            </view>
+            <view class="detail-authorsect__subscribe">关注</view>
+        </view>
+        <view class="detail-content">
+            <block wx:for="{{article.article_content}}">
+                <view wx:if="{{item.img}}" class="detail-content__paras">
+                    <image src="{{item.img}}"></image>
+                </view>
+                <view wx:if="{{item.p}}" class="detail-content__paras"><text>{{item.p}}</text></view>
+            </block>
+        </view>
+        <favored :favors.sync="favors" :unfavors.sync="unfavors" :status.sync="status"></favored>
+        <view class="detail-share">
+            <view class="detail-share__title">分享</view>
+            <view class="detail-share__platform">
+                <view class="detail-share__weixin"></view>
+                <view class="detail-share__moments"></view>
+                <view class="detail-share__qq"></view>
+            </view>
+        </view>
+        <view class="detail-comment">
+            <view class="detail-comment__header">热门评论({{3}})</view>
+            <!-- <block wx:for="{{comment_list}}"> -->
+                <comment :comment_list.sync="comment_list"></comment>
+            <!-- </block> -->
+        </view>
+        <view class="detail-post">
+            <input type="text"/>
+            <text class="detail-post__postnum"><i></i></text>
+            <text class="detail-post__collect"></text>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import Comment from "@/components/comment";
+import Favored from "@/components/favored";
+import   cloudUtils from "@/utils/cloudAsync";
+// import
+const db=wx.cloud.database();
+const article_list=db.collection('article_list');
+const comment_list=db.collection("comment_list");
+const { cloudUpdate }=cloudUtils;
+export default class Detail extends wepy.page {
+    config={
+
+    }
+    components={
+        comment:Comment,
+        favored:Favored
+    }
+    data={
+        article:{
+        },
+        comment_list:[],
+        com_liked_list:[],
+        favors:0,
+        unfavors:0,
+        status:0
+    }
+    methods={
+
+    }
+    events={
+        "likeToggled":(comment)=>{
+            let { index,comment_id }=comment;
+            let like_data=this.getLiked(comment_id);
+            this.setLiked(like_data,index);
+             console.log(this.com_liked_list)
+        },
+        "favorsChanged":({inc,status}={})=>{
+            if(!this.status)this.status=status;
+            this.setFavors(inc,status);
+        }
+    }
+    getLiked(id){
+        let list=this.com_liked_list;
+        return {
+            liked:list.includes(id),
+            like_index:list.indexOf(id),
+            id,
+            list
+        }
+    }
+    setLiked(like_data,comment_index){
+         let { liked, like_index, id,list }=like_data;
+         let like_num
+         if(!liked){
+             list.push(id);
+             this.comment_list[comment_index].favour_num++;
+             wx.cloud.callFunction({
+                 name:"setLiked",
+                 data:{
+                     "comment_id":id,
+                     "inc_num":1
+                 }
+             })
+         }else{
+             list.splice(like_index,1);
+             this.comment_list[comment_index].favour_num--;
+         }
+         this.com_liked_list=list;
+         
+    }
+    setFavors(inc,status){
+        switch (status) {
+            case 1:
+                this.favors+=inc;
+                let i=cloudUpdate(["SUF"],{"doc_id":this.article.doc_id,status,"uuid":this.uuid});
+                break;
+            case 2:
+                this.unfavors+=inc;
+                cloudUpdate(["SUF"],{"doc_id":this.article.doc_id,status});
+                break;
+        }
+        
+    }
+    async onReady(){
+        // let key=this.article_id;
+        // let record= await wepy.getStorage(key);
+        // if(key){
+        //     this.status=key.status;
+        // }else{
+        //     // this.retriveStatus();
+        // }
+            // let { data }=await comment_list.where(this.article_id).get();
+            // let { comment }=data[0];
+            // this.comment_list=comment;
+            
+        
+    }
+    async onLoad(options){
+        this.article_id ={"doc_id":options.id};
+        let { data }=await article_list.where(this.article_id).get();
+        this.article =data[0];
+        this.$apply();
+        console.log(this.article);
+        this.favors=this.article.favored;
+        this.unfavors=this.article.unfavored;
+        const uuid=this.$parent.globalData.uuid;
+        this.uuid=uuid;
+        console.log(this.uuid);
+        this.$apply();
+    }
+}
+</script>
+

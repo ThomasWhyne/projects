@@ -1,0 +1,80 @@
+<style lang="stylus">
+    .banner
+        position: relative;
+        width: 100%;
+        height: 247.5rpx;
+        .banner-item
+            width @width 
+            height @height 
+            image
+                width 95% 
+                height @height
+                margin-left 2.5%
+    .banner-indicator
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        bottom:0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+    .banner-indicator__dot
+        width: 10rpx;
+        height: 10rpx;
+        margin: 17rpx 10rpx;
+        box-shadow:0rpx 0rpx 0rpx 2rpx #ba9a6c;
+        transform:rotate3d(0,0,1,-45deg);
+    .banner-indicator__dot--on
+        box-sizing: border-box;
+        padding: 4rpx;
+        transform:rotate3d(0,0,1,-45deg) scale(1);
+        transition: all .2s;
+        background-color: #ba9a6c;
+        border: 3rpx solid rgba(0, 0, 0, 1);
+
+        
+        
+</style>
+
+<template>
+    <view class="banner">
+        <swiper circular previous-margin='67.5rpx' next-margin='67.5rpx' autoplay duration='200' @change="onBannerChange">
+            <swiper-item class='banner-item'  wx:for="{{bannerList}}" wx:key="bannerId" item-id="{{item.bannerId}}">
+                <image src='{{item.imgUrl}}'></image>
+            </swiper-item>
+        </swiper>
+        <view class="banner-indicator" >
+            <block wx:for="{{bannerList}}" wx:key="unique" >
+                <view class="banner-indicator__dot {{item.bannerId==currentBanner?'banner-indicator__dot--on':''}}"></view>
+            </block>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy"
+export default class Banner extends wepy.component {
+    props={
+        bannerList:{
+            type:Array,
+            default:[]
+        },
+        current:{
+            type:Number,
+            default:0
+        }
+    }
+    methods={
+        onBannerChange(e){
+            this.current=e.detail.current;
+        }
+    }
+    computed={
+        currentBanner(){
+            return this.bannerList[this.current]["bannerId"];
+        }
+    }
+}
+</script>
+
+

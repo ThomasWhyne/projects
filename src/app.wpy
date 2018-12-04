@@ -1,0 +1,39 @@
+<style lang="stylus">
+    page
+        font-family KaiTi
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+
+export default class extends wepy.app {
+  config = {
+    "cloud":true,
+    pages: [
+        'pages/index',
+        'pages/detail'
+    ],
+    window: {
+        "backgroundColor": "#F6F6F6",
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#fff",
+        "navigationBarTitleText": "掌上英雄联盟",
+        "navigationBarTextStyle": "black"
+    }
+  }
+
+  globalData = {
+    userInfo: null,
+    uuid:"0dee5f35-1959-48df-a868-da18d9d6be5c"
+  }
+
+  constructor () {
+    super()
+    this.use('requestfix')
+    this.use('promisify')
+  }
+
+}
+</script>
