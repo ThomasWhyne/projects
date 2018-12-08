@@ -112,7 +112,7 @@
 </style>
 
 <template>
-    <view class="detail">
+        <view class="detail" id="detail" style="height:100vh;">
         <view class="detail-header">{{article.title}}</view>
         <view class="detail-info">
             <text class="detail-info__author">{{article.author}}</text>
@@ -161,12 +161,11 @@
 import wepy from "wepy";
 import Comment from "@/components/comment";
 import Favored from "@/components/favored";
-import   cloudUtils from "@/utils/cloudAsync";
-// import
-const db=wx.cloud.database();
-const article_list=db.collection('article_list');
-const comment_list=db.collection("comment_list");
-const { cloudUpdate }=cloudUtils;
+import { _articleRetrive,_commentRetrive,_updateLiked} from "@/utils/cloudAsync";
+import {_queryViews,_insertViews} from "@/utils/storage";
+import { _throttle } from "@/utils/util";
+const fnArray=["setUserFavors","setUserLiked"];
+const cloud=wx.cloud.callFunction;
 export default class Detail extends wepy.page {
     config={
 
@@ -182,23 +181,47 @@ export default class Detail extends wepy.page {
         com_liked_list:[],
         favors:0,
         unfavors:0,
-        status:0
+        status:0,
+        offset:0,
+        initial:0,
+        bufferArray:[]
     }
     methods={
-
-    }
-    events={
-        "likeToggled":(comment)=>{
-            let { index,comment_id }=comment;
-            let like_data=this.getLiked(comment_id);
-            this.setLiked(like_data,index);
-             console.log(this.com_liked_list)
-        },
-        "favorsChanged":({inc,status}={})=>{
-            if(!this.status)this.status=status;
-            this.setFavors(inc,status);
+        onPageScroll(e){
+            this.throttle(e);
         }
     }
+    events={
+        "likeToggled":({ index,comment_id,isLiked}={})=>{
+            let data={
+                comment_id,
+                uuid:this.user_id
+            };
+            if(!isLiked){
+                this.comment_list[index].favour_num++;
+                data.inc_num=1;
+            }else{
+                this.comment_list[index].favour_num--;
+                data.inc_num=-1;
+            }
+            this.comment_list[index].isLiked=!isLiked;
+            this.bufferLiked(data);
+        },
+        "favorsChanged":(status)=>{
+            if(this.status)throw new Error("Favored Repeatedly");
+            if(status!==1||2)throw new Error("Unexpected Status");
+            this.status=status
+            status===1?this.favors+=1:this.unfavors+=1;
+            let [name]=fnArray;
+            let data={
+                    uuid:this.user_id,
+                    doc_id:this.article_id,
+                    status,
+                };
+            cloud({name,data})
+        }
+    }
+
     getLiked(id){
         let list=this.com_liked_list;
         return {
@@ -208,65 +231,60 @@ export default class Detail extends wepy.page {
             list
         }
     }
-    setLiked(like_data,comment_index){
-         let { liked, like_index, id,list }=like_data;
-         let like_num
-         if(!liked){
-             list.push(id);
-             this.comment_list[comment_index].favour_num++;
-             wx.cloud.callFunction({
-                 name:"setLiked",
-                 data:{
-                     "comment_id":id,
-                     "inc_num":1
-                 }
-             })
-         }else{
-             list.splice(like_index,1);
-             this.comment_list[comment_index].favour_num--;
-         }
-         this.com_liked_list=list;
-         
-    }
-    setFavors(inc,status){
-        switch (status) {
-            case 1:
-                this.favors+=inc;
-                let i=cloudUpdate(["SUF"],{"doc_id":this.article.doc_id,status,"uuid":this.uuid});
-                break;
-            case 2:
-                this.unfavors+=inc;
-                cloudUpdate(["SUF"],{"doc_id":this.article.doc_id,status});
-                break;
+    bufferLiked(data){
+        let index=this.bufferArray.findIndex(buffer=>buffer.comment_id==data.comment_id);
+        if(index<0){
+            this.bufferArray.push(data);
+        }else{
+            this.bufferArray.splice(index,1);
         }
-        
+        console.log(this.bufferArray);
     }
-    async onReady(){
-        // let key=this.article_id;
-        // let record= await wepy.getStorage(key);
-        // if(key){
-        //     this.status=key.status;
-        // }else{
-        //     // this.retriveStatus();
-        // }
-            // let { data }=await comment_list.where(this.article_id).get();
-            // let { comment }=data[0];
-            // this.comment_list=comment;
-            
-        
+    setoffset=(e)=>{
+        this.offset=e.scrollTop;
+        this.$apply();
     }
-    async onLoad(options){
-        this.article_id ={"doc_id":options.id};
-        let { data }=await article_list.where(this.article_id).get();
-        this.article =data[0];
+    render=({article,history,comments}={})=>{
+        if(article){
+            this.article=article;
+            this.favors=article.favored;
+            this.unfavors=article.unfavored;
+        }
+        if(history){
+            this.status=history.status;
+            this.isViewed=history.isViewed;
+            this.offset=history.offset;
+        }
+        if(comments){
+            this.comment_list=comments;
+        }
         this.$apply();
-        console.log(this.article);
-        this.favors=this.article.favored;
-        this.unfavors=this.article.unfavored;
-        const uuid=this.$parent.globalData.uuid;
-        this.uuid=uuid;
-        console.log(this.uuid);
-        this.$apply();
+    }
+    onUnload(){
+        _updateLiked(fnArray,this.bufferArray);
+        let view={
+                doc_id:this.article_id,
+                status:this.status, 
+                offset:Math.floor(this.offset)
+            };
+        _insertViews(view);
+    }
+    onReady(){
+        _commentRetrive({article_id:this.article_id,user_id:this.user_id},this.render);
+        setTimeout(()=>{
+            wx.pageScrollTo({
+                scrollTop:this.offset,
+                duration:0
+            })
+            },500)
+    }
+    onLoad(params,data){
+        let { article_id,user_id }=params;
+        let { history }=data.preload
+        this.user_id=user_id;
+        this.article_id=article_id;
+        _articleRetrive({article_id,user_id,history},this.render);
+        this.throttle=_throttle(this.setoffset,1000);
     }
 }
 </script>

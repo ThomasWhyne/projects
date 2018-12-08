@@ -120,19 +120,17 @@
                             </view>
                             <view class="container__section">
                                 <block wx:for="{{recommand_list}}" wx:key="index">
-                                    <navigator open-type='navigateTo' url='./detail?id={{item.article_id}}'>
-                                        <view class='container__section-article'>
-                                                <view class='container__article--header'>
-                                                    <view class='container__article--title'>{{item.title}}</view>
-                                                    <view class='container__article--desc'>
-                                                        <text>{{item.author}}</text>
-                                                    </view>
+                                    <view class='container__section-article' @tap="toArticleDetail({{item.article_id}})">
+                                            <view class='container__article--header'>
+                                                <view class='container__article--title'>{{item.title}}</view>
+                                                <view class='container__article--desc'>
+                                                    <text>{{item.author}}</text>
                                                 </view>
-                                                <view class='container__article--thumb'>
-                                                    <image src='{{item.image_url_small}}' mode=" aspectFill" lazy-load="{{true}}"></image>
-                                                </view>
-                                        </view>
-                                    </navigator>
+                                            </view>
+                                            <view class='container__article--thumb'>
+                                                <image src='{{item.image_url_small}}' mode=" aspectFill" lazy-load="{{true}}"></image>
+                                            </view>
+                                    </view>
                                     <!-- 视频播放组件放置区 -->
                                         <block wx:if="{{index==4}}">
                                             <view class='container__section-video'>
@@ -198,11 +196,11 @@ import Searchbar from "@/components/searchbar"
 import Container from "@/components/container"
 import Banner from "@/components/banner"
 import Vplayer from "@/components/vplayer"
+import {_queryViews, _insertViews} from "@/utils/storage"
 wx.cloud.init();
 const db=wx.cloud.database();
 const recommand_list=db.collection('recommand_list');
 const user_list=db.collection("user_list");
-
 export default class Index extends wepy.page {
     config={
     }
@@ -315,6 +313,12 @@ export default class Index extends wepy.page {
         onSwiperChange(e){
             const index =e.detail.current;
             this.swiperChanged(index,"swiper");
+        },
+        toArticleDetail(article_id){
+            let view=_queryViews(article_id);
+            let user_id=this.user_id;
+            this.$preload("history",view);
+            this.$navigate("./detail",{article_id,user_id});
         }
     }
     events={
@@ -345,6 +349,7 @@ export default class Index extends wepy.page {
         let { data }=await recommand_list.limit(10).get();
         this.recommand_list=data;
         this.$apply();
+        this.user_id=this.$parent.globalData.uuid;
         // .then(res=>{
         //     this.recommand_list=res.data;
         //     this.$apply();

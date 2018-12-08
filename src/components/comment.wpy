@@ -76,6 +76,12 @@
                 background url(before_liked) no-repeat 
                 background-position center
                 background-size contain
+    .detail-comment__userinfo-likebtn--liked
+        text
+            &:nth-child(2)
+                background url(after_liked) no-repeat 
+                background-position center
+                background-size contain
     .detail-comment__content
         height 50%
         text
@@ -111,12 +117,12 @@
                             <view class="detail-comment__userinfo--ranks">
                                 <text></text>
                                 <text>{{item.game_data.tier}}</text>
-                                <text>2小时前</text>
+                                <text>{{item.timestamp}}</text>
                             </view>
                         </view>
-                        <view class="detail-comment__userinfo-likebtn">
+                        <view class="detail-comment__userinfo-likebtn {{item.isLiked?'detail-comment__userinfo-likebtn--liked':''}}">
                             <text>{{item.favour_num}}</text>
-                            <text @tap="onToggleLiked({{index}},{{item.comment_id}})"></text>
+                            <text @tap="onToggleLiked({{index}},{{item.comment_id}},{{item.isLiked}})"></text>
                         </view>
                     </view>
                     <view class="detail-comment__content {{item.spreaded?'detail-comment__content--spread':''}}">
@@ -147,13 +153,18 @@ export default class Comment extends wepy.component {
             // this.comment_list[index].spreaded=!this.comment_list[index].spreaded;
             this.$apply();
         },
-        onToggleLiked(index,comment_id){
+        onToggleLiked(index,comment_id,isLiked){
             let comment={ 
                 index,
-                comment_id
+                comment_id,
+                isLiked
             };
             this.$emit("likeToggled",comment);
         }
+    }
+    timeformat(timestamp){
+        console.log("jack")
+        // return _formate({time:timestamp});
     }
     setSpread(index){
         return this.comment_list.filter((cmt,idx)=>{

@@ -35,11 +35,11 @@
 <template>
     <view class="detail-praise">
         <block wx:if="{{!status}}">
-            <view class="detail-praise__wrapper" @tap="onFavored">
+            <view class="detail-praise__wrapper" @tap="onTapFavor({{1}})">
                 <view class="detail-praise__like"></view>
                 <text>{{favors}}</text>
             </view>
-            <view class="detail-praise__wrapper" @tap="onUnfavored">
+            <view class="detail-praise__wrapper" @tap="onTapFavor({{2}})">
                 <view class="detail-praise__unlike"></view>
                 <text>{{unfavors}}</text>
             </view>
@@ -75,12 +75,9 @@ export default class Favored extends wepy.component{
         }
     }
     methods={
-        onFavored(){
-            this.$emit("favorsChanged",{inc:1,status:1})
-        },
-        onUnfavored(){
-            this.$emit("favorsChanged",{inc:1,status:2})
-        }
+       onTapFavor(status){
+           this.$emit("favorsChanged",status);
+       }
     }
 }
 </script>

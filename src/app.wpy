@@ -23,7 +23,6 @@ export default class extends wepy.app {
         "navigationBarTextStyle": "black"
     }
   }
-
   globalData = {
     userInfo: null,
     uuid:"0dee5f35-1959-48df-a868-da18d9d6be5c"
@@ -34,6 +33,10 @@ export default class extends wepy.app {
     this.use('requestfix')
     this.use('promisify')
   }
-
+    onLaunch(){
+    if(!wx.getStorageSync("view")){
+        wx.setStorageSync("views", []);
+    }
+  }
 }
 </script>
