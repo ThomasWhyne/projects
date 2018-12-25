@@ -25,7 +25,7 @@
 
 <template>
     <view class="searchbar">
-            <label for="" class="searchbar__label" wx:if="{{!inputFocus && !inputValue}}" @tap="onSearchClick">
+            <label for="" class="searchbar__label" wx:if="{{!inputFocus && !inputValue}}" @tap.stop="onSearchClick">
                 <icon class="searchbar__icon" type="search" size="12" />
                 <!-- serchicon:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAYCAMAAAAmopZHAAAAVFBMVEUAAACXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqayXqax5xW7nAAAAG3RSTlMA4RD6awjT8LPo2Bm+gip5YbdlIQZ688iNTjOVV863AAAAwElEQVQoz3WRVxbCMBADte6xHdJpuv89eTiUmAR9jvaNy2KNMkH0OQajsIntPLUbctT0i/3gyTH2ZVD1kW564SRsZ7wyt5S0Si7ssUnPS1F1bFGlZfdUeplrPotXgCmWKiMNELT65UkHQBx2iQLoYc+zBs4HfNBAPPA4OT6XATAcf7mhKe+yNbbi1f9/gHW1aaRbBVPDq/1IruTtuxcxqdzECMnm9B5aPBlzFtIv96YUm71rKXs/lWKXUmQcFjk9AC6JCVBPuswoAAAAAElFTkSuQmCC' -->
                 <text class="searchbar__text">{{placeholder}}</text>
@@ -37,9 +37,6 @@
 <script>
     import wepy from "wepy"
     export default class Searchbar extends wepy.component{
-        components={
-            
-        }
         props={
             placeholder:{
                 type:String,
@@ -60,13 +57,7 @@
         }
         methods={
             onSearchClick(){
-                // this.$invoke("poplayer","onPopToggle");
-                console.log('jacks')
-                this.inputFocus=true;
-            },
-            onSearchCancel(){
-                this.inputFocus=false;
-                // this.$invoke("poplayer","onPopToggle");
+                console.log(":fuck the wepy")
             }
         }
 }

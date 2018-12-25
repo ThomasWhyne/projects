@@ -12,8 +12,11 @@ export default class extends wepy.app {
   config = {
     "cloud":true,
     pages: [
+        'pages/login',
         'pages/index',
-        'pages/detail'
+        'pages/detail',
+        'pages/reply',
+        'pages/singleReply'
     ],
     window: {
         "backgroundColor": "#F6F6F6",
@@ -24,8 +27,19 @@ export default class extends wepy.app {
     }
   }
   globalData = {
-    userInfo: null,
-    uuid:"0dee5f35-1959-48df-a868-da18d9d6be5c"
+    // userData: {
+    // "gender": 1,
+    // "logo_url": "http://q4.qlogo.cn/g?b=qq\u0026k=oJrFtCuotoicerMypMmurIQ\u0026s=140\u0026t=1439899557",
+    // "nick": "并非阿伦.",
+    // "urltime": 0,
+    // "uuid": "0dee5f35-1959-48df-a868-da18d9d6be5c",
+    // "favored":[],
+    // "unfavored":[],
+    // "followed":[],
+    // "liked":[],
+    // "tier":" 白银Ⅳ"
+    // },
+    // uuid:"0dee5f35-1959-48df-a868-da18d9d6be5c"
   }
 
   constructor () {
@@ -37,6 +51,7 @@ export default class extends wepy.app {
     if(!wx.getStorageSync("view")){
         wx.setStorageSync("views", []);
     }
+    wx.cloud.init();
   }
 }
 </script>

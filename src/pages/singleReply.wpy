@@ -1,0 +1,112 @@
+<style lang="stylus">
+    arrow='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAXCAMAAADTAfSvAAAAdVBMVEUAAACviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDyviDw1EeluAAAAJnRSTlMAwbzHuwazsK2sBfGQqwPwAZKhle7oP/L0PueR7ZSqjwSvssi9xZrhkzsAAACHSURBVBjTfdBJFoJADATQiEbAAdI44Iyi1v2PaJ7tAtJ51iJd9ZdN9M0Emd4pZkyDAIh3zp4iZ09RsKcoF1aXK23rymgtQWtjlWQDbBMlCbt9qoO0rtZ/9eAqfvt4OkuqF+AqiTZag1itbto7q3Qv41eNlbjwlPjhKXEfdztS4gxPfV54x/0BULEZQYU7RfEAAAAASUVORK5CYII='
+    .container-reply__header
+        width 100%
+        height 50rpx
+        background-color #f0f4f8
+        font-size 23rpx
+        line-height 50rpx
+        color #c2baa8
+        text
+            float right
+            margin-right 30rpx
+    .arrow_tag
+        display inline-block
+        margin-top 5rpx
+        margin-right  10rpx!important
+        
+        background-image url(arrow)
+        background-size contain
+        background-position center
+        background-repeat no-repeat
+        width 30rpx
+        height 40rpx
+</style>
+
+<template>
+    <view class="container-origincom">
+        <oriComment :comment_list.sync="originalist"></oriComment>
+    </view>
+    <view class="container-reply">
+        <view class="container-reply__header" @tap="onOderToggled">
+            <text>{{oderTag}}</text>
+            <text class="arrow_tag"></text>
+        </view>
+        <recomment :comment_list.sync="showList" :showReply="showReply"></recomment>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import Comment from "@/components/comment";
+import { _articleRetrive,_commentRetrive,_updateLiked} from "@/utils/cloudAsync";
+const oderTag=["按热度"],toggler="按时间";
+export default class SingleReply extends wepy.page{
+    data={
+        originalist:[],
+        showList:[],
+        hotReply:[],
+        newReply:[],
+        showReply:true
+    }
+    methods={
+        onOderToggled(){
+          if(oderTag.includes(toggler)){
+              oderTag.shift();
+              this.showList=this.hotReply;
+          }else{
+              oderTag.unshift(toggler);
+              !this.newReply.length ?this.retriveNewReply():this.showList=this.newReply;
+          }
+
+        }
+    }
+    watch={
+    }
+    computed={
+        oderTag(){
+            return oderTag[0];
+        }
+    }
+    events={
+
+    }
+    render=({comments,flag="hotReply"}={})=>{
+        this[flag].push(...comments);
+        this.showList=this[flag];
+        this.$apply();
+        console.log(this[flag]);
+    }
+    retriveNewReply(){
+         _commentRetrive({
+                    comment_id:this.comment_id,
+                    user_id:this.user_id,
+                    depth:1,
+                    orderKey:"timestamp"
+                },({comments})=>{
+                    this.render({comments,flag:"newReply"})
+            });
+    }
+    onLoad(params,data){
+        let {comment_id,user_id}=params;
+        let { comment }=data.preload;
+        this.originalist.push(comment);
+        this.comment_id=comment_id;
+        this.user_id=user_id;
+        console.log(comment_id);
+        _commentRetrive({
+            comment_id,
+            depth:1,
+            user_id},this.render);
+    }
+    config={
+
+    }
+    components={
+        oriComment:Comment,
+        recomment:Comment,
+    }
+}
+</script>
+
+

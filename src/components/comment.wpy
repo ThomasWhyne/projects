@@ -1,7 +1,10 @@
 <style lang="stylus">
     @import "../common/detail__bg.styl";
+    vendors=official
     .detail-commnet__main
+        position relative
         display flex
+        flex-wrap wrap
         min-height 172rpx
         margin 10rpx auto 
         border-bottom 1rpx solid #ececec
@@ -82,22 +85,27 @@
                 background url(after_liked) no-repeat 
                 background-position center
                 background-size contain
+                animation-name spin 
+                animation-iteration-count 1
+                animation-duration .7s
+                animation-timing-function ease-in
     .detail-comment__content
         height 50%
+        font-size 25rpx
         text
             max-width 90%
             text-align justify
             line-height 1.5
             word-break break-all
             box-sizing border-box
-            font-size 25rpx
             display -webkit-box
             -webkit-box-orient vertical
             -webkit-line-clamp 4
             text-overflow ellipsis
             overflow hidden
+            margin-bottom:10rpx;
         i
-            font-size 25rpx
+            
             padding 3rpx
             border-radius 3rpx
             color #af883c
@@ -105,35 +113,101 @@
     .detail-comment__content--spread
         text
             display block
-</style>
+    .detail-comment__content--to
+        display flex
+    .detail-comment_menu
+        position absolute
+        width 30rpx
+        height 30rpx
+        padding-right:34rpx;
+        right 0 
+        bottom 32rpx
+        image
+            width 30rpx
+            height 30rpx
+    .detail-comment__reply
+        width 80%
+        height 50%
+        padding-left 12rpx
+        margin 30rpx 0rpx 30rpx 80rpx
+        font-size 25rpx
+        white-space nowrap
+        line-height 1.6
+    .detail-comment__reply--brife
+        height 100rpx
+        padding 20rpx
+        line-height 50rpx
+        background-color #f5f5f5
+        text
+            color #416a74
+        view
+            text-overflow ellipsis
+            padding-right 20rpx
+            overflow hidden
+@keyframes spin {
+  from{
+    transform: rotateZ(0deg) scale(1);
+  }
+  50%{
+    transform: rotateZ(0deg) scale(1.5);
+  }
+  70%{
+    transform: rotateZ(-45deg) scale(1.5);
+  }
+  90%{
+    transform: rotateZ(45deg) scale(1.5);
+  }
+  to{
+    transform: rotateZ(0deg) scale(1);
+  }
+}
+</style>    
 
 <template>
-    <view wx:for="{{comment_list}}" wx:key="index" class="detail-commnet__main">
-            <view class="detail-comment__avatar"><image src="{{item.game_data.logo_url}}"></image></view>
-                <view class="detail-comment__bd">
-                    <view class="detail-comment__userinfo">
-                        <view class="detai-comment__userinfo-desc">
-                            <view class="detail-comment__userinfo--nickname">{{item.game_data.nick}}</view>
-                            <view class="detail-comment__userinfo--ranks">
-                                <text></text>
-                                <text>{{item.game_data.tier}}</text>
-                                <text>{{item.timestamp}}</text>
-                            </view>
-                        </view>
-                        <view class="detail-comment__userinfo-likebtn {{item.isLiked?'detail-comment__userinfo-likebtn--liked':''}}">
-                            <text>{{item.favour_num}}</text>
-                            <text @tap="onToggleLiked({{index}},{{item.comment_id}},{{item.isLiked}})"></text>
-                        </view>
+    <view wx:for="{{comment_list}}" wx:key="index" class="detail-commnet__main" >
+        <view class="detail-comment__avatar"><image src="{{item.game_data.logo_url}}"></image></view>
+        <view class="detail-comment__bd">
+            <view class="detail-comment__userinfo">
+                <view class="detai-comment__userinfo-desc">
+                    <view class="detail-comment__userinfo--nickname">{{item.game_data.nick}}</view>
+                    <view class="detail-comment__userinfo--ranks">
+                        <text></text>
+                        <text>{{item.game_data.tier}}</text>
+                        <text>{{item.timestamp}}</text>
                     </view>
-                    <view class="detail-comment__content {{item.spreaded?'detail-comment__content--spread':''}}">
-                        <text >{{item.content}}</text>
-                        <block wx:if="{{item.content.length>100}}">
-                            <i @tap="onToggleSpread({{index}})">全文</i>
-                        </block>
-                    </view>
+                </view>
+                <view class="detail-comment__userinfo-likebtn {{item.isLiked?'detail-comment__userinfo-likebtn--liked':''}}">
+                    <text>{{item.favour_num}}</text>
+                    <text @tap="onToggleLiked({{index}},{{item.comment_id}},{{item.isLiked}})"></text>
+                </view>
             </view>
+            <view class="detail-comment__content {{item.spreaded?'detail-comment__content--spread':''}}" >
+                <view wx:if="{{showReply && item.reply_to}}" class="detail-comment__content--to">
+                    <text>回复: </text>
+                    <text style="color:#416a74;" @tap="toUserInfo({{item.parent_uuid}})">{{item.reply_to}}</text>
+                </view>
+                <text @tap="onCommentTap">{{item.content}}</text>
+                <image wx:if="{{item.sticker_src}}" src="{{item.sticker_src}}" style="height:78rpx;width:78rpx;"/>
+                <block wx:if="{{item.content.length>100}}">
+                    <i @tap="onToggleSpread({{index}})">全文</i>
+                </block>
+            </view>
+        </view>
+        <view class="detail-comment_menu" @tap="onMenuTaped({{item.comment_id}},{{item.comment_uuid}},{{item.game_data.nick}})">
+            <image src="./../assets/match_replay_icon.png"/>
+        </view>
+        <block wx:if="{{showReply && item.total_reply}}">
+            <view class="detail-comment__reply">
+                <view class="detail-comment__reply--brife" @tap="onBrifeTap({{item.comment_id}},{{index}})">
+                    <view><text>{{item.first_reply.nickname}}:</text>{{item.first_reply.brife}}</view>
+                    <text>等共{{item.total_reply}}条回复></text>
+                </view>   
+                </view>
+            </view>
+        </block>
     </view>
 </template>
+
 
 <script>
 import wepy from "wepy"
@@ -142,6 +216,10 @@ export default class Comment extends wepy.component {
         comment_list:{
             type:Array,
             default:[]
+        },
+        showReply:{
+            type:Boolean,
+            default:false
         }
     }
     data={
@@ -160,7 +238,23 @@ export default class Comment extends wepy.component {
                 isLiked
             };
             this.$emit("likeToggled",comment);
+        },
+        onCommentTap(e){
+            this.$emit("toReply",this.comment_list);
+        },
+        onBrifeTap(comment_id,index){
+            console.log(comment_id);
+            this.$emit("brifeTaped",comment_id,index);
+        },
+        onMenuTaped(comment_id,paren_uuid,reply_to){
+            this.$emit("showReplyMenu",{
+                path:comment_id,
+                parent:paren_uuid,
+                to:reply_to,
+                depth:1
+            })
         }
+        
     }
     timeformat(timestamp){
         console.log("jack")

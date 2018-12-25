@@ -1,5 +1,130 @@
 <style lang="stylus">
     @import "./../common/container__bg.styl"
+    .container-userinfo
+        position relative
+        width  90%
+        height 25%
+        left 5%
+        top 7%
+        background-color:rgba(0,0,0,.2);
+        border-radius:15rpx;
+        &:after
+            content ''
+            position absolute
+            top 0
+            left 0
+            bottom 0
+            right 0 
+            filter blur(1rpx)
+            border-radius 15rpx
+            z-index -1
+    .container-userinfo__avatar
+        position:relative;
+        width: 200rpx;
+        height: 200rpx;
+        left: 50%;
+        transform: translate(-50%,-50%); 
+        image
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            height: 79rpx;
+            width:79rpx;
+            border-radius: 50%;
+    .container-userinfo__detail
+        position: absolute;
+        width: 100%;
+        height: 66.6%;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        flex: 1;
+    .container-userinfo__nickname
+    .container-userinfo__signature
+        flex-basis: 37rpx;
+        margin-top: 3rpx;
+        width: 70%;
+        text-align: center;
+     .container-userinfo__nickname 
+        text
+            margin-right: 5px;
+            display: inline-block;
+            vertical-align: middle;
+        text:first-child
+            font-size: 27rpx;
+            font-weight:bold;
+            color: #fff;
+        text:nth-child(2)
+            box-sizing: border-box;
+            height: 27rpx;
+            font-size: 20rpx;
+            background-color: #fff;
+            border-radius: 7rpx;
+            line-height: 27rpx;
+            padding: 2rpx;
+            color: #26a9a2;
+        image
+            height: 25rpx;
+            width: 25rpx;
+            background-color:#fff;
+            padding:2rpx;
+            box-sizing:border-box;
+            vertical-align:-6%;
+            border-radius: 5rpx;
+    .container-userinfo__signature
+        font-size: 19rpx;
+        color: #a1b2b5;
+        line-height:50rpx
+    .container-userinfo__checkinfo
+        position: relative;
+        display: flex;
+        justify-content: space-around;
+        text:nth-child(2n+1)
+            font-weight:bolder;
+            color: #dab68a;
+        text:nth-child(2n)
+            font-size: 19rpx;
+            color: #8d8d8f;
+    .container-userinfo__focuses
+    .container-userinfo__fans
+    .container-userinfo__buddies
+    .container-userinfo__posts
+        text
+            display: block;
+            text-align: center;
+    .container-userinfo__activities
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        height: 45%;
+        width: 90%;
+        margin:20% 5%;
+        color: #fff;
+        navigator
+            margin: 10rpx 50rpx;
+            border-bottom: 1rpx dashed rgba(0, 0, 0, .8);
+        text
+            display: inline-block;
+            padding-bottom: 15rpx;
+            color:#8d8d8f
+            font-size: 27rpx;
+            margin-left: 10rpx;
+    .container-userinfo__footer
+        position: absolute;
+        box-sizing: border-box;
+        padding: 50rpx;
+        width: 90%;
+        height: 10%;
+        left: 5%;
+        bottom: 0;
+        display: flex;
+        align-items:flex-end;
+        justify-content:space-between;
+        color: #fff;
+        font-size: 20rpx;
     .container-sidenav
         position absolute
         width 70%
@@ -7,10 +132,15 @@
         background-color aqua
         left -70%
         transition all .4s
-        z-index 2
+        z-index 200
         background-image url(bg_1)
         background-size cover
         background-repeat no-repeat
+    navigator
+        image
+            width 40rpx
+            height 40rpx
+            vertical-align -15%
     .container-sidenav--in
         left 0
     .container-mask
@@ -41,15 +171,15 @@
             <view class="container-userinfo__qrcode"></view>
             <view class="container-userinfo__avatar">
                 <text class="container-userinfo__settag"></text>
-                <image src="https://q4.qlogo.cn/g?b=qq&k=oJrFtCuotoicerMypMmurIQ&s=140&t=1439899557"></image>
+                <image src="{{userData.logo_url}}"></image>
                 <text class="container-userinfo__cover"></text>
             </view>
             <view class="container-userinfo__arrow"></view>
             <view class='container-userinfo__detail'>
                 <view class='container-userinfo__nickname'>
-                    <text>并非阿伦</text>
-                    <text>Lv3</text>
-                    <text></text>
+                    <text>{{userData.nick}}</text>
+                    <text>{{userData.tier}}</text>
+                    <image wx:if="{{userData.gender===1}}" src="./../assets/peoplenearby_man_color.png"/>
                 </view>
                 <view class='container-userinfo__signature'>
                     <text>打死不玩上单(￣▽￣)</text></view>
@@ -57,25 +187,25 @@
                 <view class='container-userinfo__checkinfo'>
                     <view class='container-userinfo__focuses'>
                     <navigator>
-                        <text>6</text>
+                        <text>{{userData.follows || 0}}</text>
                         <text>关注</text>
                     </navigator> 
                     </view>
                     <view class='container-userinfo__fans'>
                     <navigator>
-                        <text>0</text>
+                        <text>{{userData.fans||0}}</text>
                         <text>粉丝</text>
                     </navigator> 
                     </view>
                     <view class='container-userinfo__buddies'>
                     <navigator>
-                        <text>0</text>
+                        <text>{{userData.buddies||0}}</text>
                         <text>好友</text>
                     </navigator> 
                     </view>
                     <view class='container-userinfo__posts'>
                     <navigator>
-                        <text>37</text>
+                        <text>{{userData.posts||0}}</text>
                         <text>发表</text>
                     </navigator> 
                     </view>
@@ -83,32 +213,32 @@
             </view>
             <view class='container-userinfo__activities'>
                 <navigator class='container-userinfo__related'>
-                    <text></text>
+                    <image src="./../assets/menu_my_messages_press.png"/>
                     <text>与我相关</text>
                 </navigator>
                 <navigator class='container-userinfo__center'>
-                    <text></text>
+                    <image src="./../assets/menu_act_center_press.png"/>
                     <text>活动中心</text>
                 </navigator>
                 <navigator class='container-userinfo__orders'>
-                    <text></text>
+                    <image src="./../assets/menu_trade_press.png" />
                     <text>我的订单</text>
                 </navigator>
                 <navigator class='container-userinfo__missions'>
-                    <text></text>
+                    <image src="./../assets/menu_subscribe_press.png"/>
                     <text>我的任务</text>
                 </navigator>
                 <navigator class='container-userinfo__collected'>
-                    <text></text>
+                    <image src="./../assets/menu_favorite_press.png" />
                     <text>我的收藏</text>
                 </navigator>
             </view>
             <view class='container-userinfo__footer'>
                 <navigator>
-                    <text>۞</text>
+                    <image src="./../assets/menu_setting_press.png" />
                 </navigator>
                 <navigator>
-                    <text>✚</text>
+                    <image src="./../assets/menu_find_press.png" />
                 </navigator>
             </view>
         </view>
@@ -127,6 +257,10 @@ export default class Container extends wepy.component {
         shift:{
             type:Boolean,
             default:false
+        },
+        userData:{
+            type:Object,
+            default:{}
         }
     }
 

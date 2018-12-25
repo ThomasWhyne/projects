@@ -32,27 +32,46 @@ const _throttle=(fn,wait)=>{
 //         },wait)
 //     }
 // }
-const _formate=({time}={})=>{
+var getLastDate = function (time) {
+    var date = getDate(time)
+    var month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+    var day = date.getDay() < 10 ? '0' + (date.getDay()) : date.getDay()
+    return date.getFullYear() + '-' + month + '-' + day
+}
+const _formate=(time)=>{
     let now = +new Date();
-    let difference = (now - time) / 10000;
+    let difference =(now - time) / 1000;
     let stamp = "";
-    let { floor, ceil } = Math;
-    return (difference <= 0 || floor(difference / 60) <= 0)
-        ? "刚刚"
-        : difference < 3600
-            ? `${floor(difference / 60)}分钟前`
-            : difference >= 3600 && difference <= 86400
-                ? `${floor(difference)}小时前`
-                : difference / 86400 <= 1
-                    ? "昨天"
-                    : difference / 86400 <= 31 && difference / 86400 > 1
-                        ? `${ceil(difference)}天前`
-                        : difference / 86400 >= 31
-                            ? new Date(time).toLocaleString()
-                            : "在很久很久以前"
+    if (time <= 0) {
+        stamp = '刚刚'
+    } else if (Math.floor(difference / 60) <= 0) {
+        stamp = '刚刚'
+    } else if (difference < 3600) {
+        stamp = Math.floor(difference / 60) + '分钟前'
+    } else if (difference >= 3600 && (time - now >= 0)) {
+        stamp = Math.floor(difference / 3600) + '小时前'
+    } else if (difference / 86400 <= 31) {
+        stamp = Math.ceil(difference / 86400) + '天前'
+    } else {
+        stamp = getLastDate(time);
+    }
+    return stamp;
 }
 
+const _createRandom = () => {
+    const strings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const { max: Max, min: Min, random: Ran, ceil: Ceil, floor: Floor } = Math;
+    const len = strings.length;
+    const start = Floor(Ran() * len);
+    const end = start >= len - 9 ? start - 9 : start + 9;
+    return Array
+        .from(strings)
+        .slice(Min(start, end), Max(start, end))
+        .map((str, idx, arr) => `${str}${strings[Floor(Ran() * len)]}`)
+        .join("");
+}
 export {
     _throttle,
-    _formate
+    _formate,
+    _createRandom
 }

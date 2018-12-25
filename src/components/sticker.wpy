@@ -1,0 +1,169 @@
+<style lang="stylus">
+    .sticker-container
+        height 100%;
+        display flex
+        flex-wrap wrap
+        align-content center
+        border-radius 10rpx
+        background-color #eee
+        text
+            text-align center
+            line-height 78rpx
+            flex-basis 78rpx
+            height 78rpx
+            border-radius 8rpx
+            &:active
+                background-color #fff
+        image
+            width 100rpx
+            height 100rpx
+            margin 25rpx
+            border-radius 8rpx
+            background-color #e3e3e3
+    .sticker-footer
+        height 68rpx
+        display flex
+        border-radius 5rpx
+        align-items center
+        view 
+            height 100%
+            width 68rpx
+            text-align center
+        image
+            margin-top 10rpx
+            height 50rpx
+            width 50rpx
+    .current
+        background-color #eee
+</style>
+
+<template>
+    <swiper current="{{current}}">
+        <swiper-item>
+            <swiper indicator-dots>
+                <block wx:for="{{emojiSet}}">
+                <swiper-item>
+                    <view class="sticker-container">
+                        <block wx:for="{{item}}" wx:for-item="trunck" wx:for-index="sub_index">
+                            <text @tap="onEmojiTaped({{index}},{{sub_index}})">{{trunck}}</text>
+                        </block>
+                    </view>
+                </swiper-item>
+                </block>
+            </swiper>
+        </swiper-item>
+        <swiper-item>
+            <view class="sticker-container">
+                <block wx:for="{{stickerSet}}">
+                    <image src="{{item}}" @tap="onStickerTap({{item}})" mode=" aspectFill"></image>
+                </block>
+                <image src="./../assets/add_square_press.png" @tap="addSticker"/>
+            </view>
+        </swiper-item>
+    </swiper>
+    <view class="sticker-footer" @tap="onFooterTap">
+        <view class="{{current==0?'current':''}}"><image src="./../assets/system_face_icon.png" /></view>
+        <view class="{{current==1?'current':''}}"><image src="./../assets/add_title_selected.png"/></view>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import Navbar from "./navbar" ;
+import { _addNewSticker } from "@/utils/cloudAsync";
+export default class Sticker extends wepy.component {
+    props={
+
+    }
+    data={
+        emojiSet:[
+            ["😁",
+            "😂",
+            "😃",
+            "😄",
+            "😅",
+            "😆",
+            "😆",
+            "😇",
+            "😈",
+            "😉",
+            "😊",
+            "😋",
+            "😌",
+            "😍",
+            "😎",
+            "😏",
+            "😐",
+            "😑",
+            "😒",
+            "😓",
+            "😔",
+            "😕",
+            "😖",
+            "😗",
+            "😘",
+            "😙",
+            "😚"],[
+            "😛",
+            "😜",
+            "😝",
+            "😞",
+            "😟",
+            "😠",
+            "😡",
+            "😢",
+            "😣",
+            "😤",
+            "😥",
+            "😦",
+            "😧",
+            "😨",
+            "😩",
+            "😪",
+            "😫",
+            "😬",
+            "😭",
+            "😮",
+            "😯",
+            "😰",
+            "😱",
+            "😲",
+            "😳",
+            "😴",
+            "😵"
+            ],[
+            "😶",
+            "😷"
+            ]
+    ],
+    stickerSet:[],
+    current:0
+    }
+    methods={
+        onEmojiTaped(outerIndex,innerIndex){
+            let emoji=this.emojiSet[outerIndex][innerIndex];
+            this.$emit("concatEmoji",emoji);
+        },
+        onFooterTap(){
+            this.current=this.current==1?0:1;
+        },
+        addSticker(){
+            _addNewSticker((sticker)=>{
+                this.stickerSet.push(sticker);
+                this.$apply();
+            })
+        },
+        onStickerTap(sticker_src){
+            this.$emit("stickerSelected",sticker_src);
+        }
+    }
+    computed={
+
+    }
+    components={
+        navbar:Navbar
+    }
+}
+</script>
+
+

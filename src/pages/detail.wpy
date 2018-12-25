@@ -109,6 +109,31 @@
         font-size 23rpx
         line-height 50rpx
         color #889191
+    .detail-comment__footer
+        margin-bottom 90rpx
+        height 68rpx
+        view
+            width 25%
+            display flex
+            align-items center
+            justify-content center
+            height 58rpx
+            margin 20rpx auto
+            border-radius 20rpx    
+            background-color #f0f4f8
+            text
+                font-size 22rpx
+                color #889191
+            image
+                height 22rpx
+                width 12rpx
+                vertical-align baseline
+                margin-left 10rpx
+    .detail-post
+        position fixed
+        bottom 0
+        width 100%
+
 </style>
 
 <template>
@@ -144,74 +169,73 @@
             </view>
         </view>
         <view class="detail-comment">
-            <view class="detail-comment__header">热门评论({{3}})</view>
-            <!-- <block wx:for="{{comment_list}}"> -->
-                <comment :comment_list.sync="comment_list"></comment>
-            <!-- </block> -->
+            <view class="detail-comment__header">热门评论({{hotNum}})</view>
+            <comment :comment_list.sync="comment_list"></comment>
+            <view class="detail-comment__footer">
+                <view @tap="moreTaped">
+                    <text>更多评论</text>
+                    <image src="./../assets/arrow_right_light.png" mode="aspectFill"/>
+                </view>
+            </view>
         </view>
         <view class="detail-post">
-            <input type="text"/>
-            <text class="detail-post__postnum"><i></i></text>
-            <text class="detail-post__collect"></text>
+            <inputer></inputer>
         </view>
     </view>
 </template>
 
 <script>
 import wepy from "wepy";
+import CommentMix from "@/mixins/commentMix";
 import Comment from "@/components/comment";
 import Favored from "@/components/favored";
+import Inputer from "@/components/inputer";
 import { _articleRetrive,_commentRetrive,_updateLiked} from "@/utils/cloudAsync";
 import {_queryViews,_insertViews} from "@/utils/storage";
 import { _throttle } from "@/utils/util";
 const fnArray=["setUserFavors","setUserLiked"];
 const cloud=wx.cloud.callFunction;
+const db = wx.cloud.database();
+const users = db.collection("user_list");
 export default class Detail extends wepy.page {
-    config={
-
-    }
+    mixins=[CommentMix]
     components={
         comment:Comment,
-        favored:Favored
+        favored:Favored,
+        inputer:Inputer
     }
     data={
+        user_id:'',
+        article_id:'',
         article:{
         },
-        comment_list:[],
-        com_liked_list:[],
         favors:0,
         unfavors:0,
-        status:0,
         offset:0,
-        initial:0,
-        bufferArray:[]
+        status: 0,
+        comment_list: [],
+        bufferArray: [],
+        newComments:[]
     }
     methods={
         onPageScroll(e){
             this.throttle(e);
+        },
+        moreTaped(){
+            let coms=this.comment_list;
+            let user_id=this.user_id;
+            let article_id=this.article_id;
+            this.$preload("comment",coms);
+            this.$navigate("./reply",{user_id,article_id});
         }
     }
     events={
-        "likeToggled":({ index,comment_id,isLiked}={})=>{
-            let data={
-                comment_id,
-                uuid:this.user_id
-            };
-            if(!isLiked){
-                this.comment_list[index].favour_num++;
-                data.inc_num=1;
-            }else{
-                this.comment_list[index].favour_num--;
-                data.inc_num=-1;
-            }
-            this.comment_list[index].isLiked=!isLiked;
-            this.bufferLiked(data);
-        },
         "favorsChanged":(status)=>{
             if(this.status)throw new Error("Favored Repeatedly");
-            if(status!==1||2)throw new Error("Unexpected Status");
+            console.log(status)
+            if(status!==1 && status !==2)throw new Error("Unexpected Status");
             this.status=status
-            status===1?this.favors+=1:this.unfavors+=1;
+            status==1?this.favors+=1:this.unfavors+=1;
             let [name]=fnArray;
             let data={
                     uuid:this.user_id,
@@ -219,26 +243,19 @@ export default class Detail extends wepy.page {
                     status,
                 };
             cloud({name,data})
-        }
+        },
+        "toReply": () => {
+            let user_id = this.user_id,
+                article_id = this.article_id;
+                console.log(user_id,article_id);
+            this.$preload("comments", this.comment_list);
+            this.$navigate("./reply", { user_id,article_id,});
+        },
     }
-
-    getLiked(id){
-        let list=this.com_liked_list;
-        return {
-            liked:list.includes(id),
-            like_index:list.indexOf(id),
-            id,
-            list
+    computed={
+        hotNum(){
+            return this.comment_list.length;
         }
-    }
-    bufferLiked(data){
-        let index=this.bufferArray.findIndex(buffer=>buffer.comment_id==data.comment_id);
-        if(index<0){
-            this.bufferArray.push(data);
-        }else{
-            this.bufferArray.splice(index,1);
-        }
-        console.log(this.bufferArray);
     }
     setoffset=(e)=>{
         this.offset=e.scrollTop;
@@ -255,13 +272,16 @@ export default class Detail extends wepy.page {
             this.isViewed=history.isViewed;
             this.offset=history.offset;
         }
-        if(comments){
-            this.comment_list=comments;
-        }
+        if (comments) {
+                this.comment_list = comments;
+                this.$apply();
+            }
         this.$apply();
     }
+    initMixin(){
+        this.$mixins.map(m=>m.page=this);
+    }
     onUnload(){
-        _updateLiked(fnArray,this.bufferArray);
         let view={
                 doc_id:this.article_id,
                 status:this.status, 
@@ -270,7 +290,7 @@ export default class Detail extends wepy.page {
         _insertViews(view);
     }
     onReady(){
-        _commentRetrive({article_id:this.article_id,user_id:this.user_id},this.render);
+        _commentRetrive({ article_id: this.article_id, user_id: this.user_id, depth: 0 }, this.render);
         setTimeout(()=>{
             wx.pageScrollTo({
                 scrollTop:this.offset,
@@ -285,6 +305,14 @@ export default class Detail extends wepy.page {
         this.article_id=article_id;
         _articleRetrive({article_id,user_id,history},this.render);
         this.throttle=_throttle(this.setoffset,1000);
+        this.initMixin();
+//         users.where({uuid:"0dee5f35-1959-48df-a868-da18d9d6be5c"}).field({liked:true}).get().then(res=>{
+    
+//     console.log(res.data)
+//   })
+    }
+    config={
+
     }
 }
 </script>

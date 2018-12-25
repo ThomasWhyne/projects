@@ -1,5 +1,6 @@
 <style lang="stylus">
     @import "../common/detail__bg.styl";
+    vendors=official
     .detail-praise
         width 100%
         height 130rpx
@@ -30,6 +31,29 @@
         background-image url(after_praise)
     .detail-praise__unlike--after
         background-image url(after_dispraised)
+    .detail-praise__like--after
+    .detail-praise__unlike--after
+        animation-name spin 
+        animation-iteration-count 1
+        animation-duration .7s
+        animation-timing-function linear
+@keyframes spin {
+  from{
+    transform: rotateZ(0deg) scale(1);
+  }
+  20%{
+    transform: rotateZ(0deg) scale(1.5);
+  }
+  40%{
+    transform: rotateZ(-45deg) scale(1.5);
+  }
+  80%{
+    transform: rotateZ(45deg) scale(1.5);
+  }
+  to{
+    transform: rotateZ(0deg) scale(1);
+  }
+}
 </style>
 
 <template>

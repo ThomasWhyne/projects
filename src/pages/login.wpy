@@ -1,0 +1,223 @@
+<style lang="stylus">
+    vendors=official
+    .status--in
+        .cup
+            top 32%
+        .logo
+            left 10%
+        .description
+            left 13%
+        .loginbar
+            opacity 1
+    .bg
+        position relative
+        height 100vh
+    .bg-main
+        width 100%
+        height 100%
+    .logo
+    .description
+        position absolute
+        transition left 1s linear 
+        transition-delay 1s
+    .logo
+        left -78% 
+        top -13% 
+    .description
+        position:absolute;
+        width:70%;
+        height:167rpx;
+        background-image url("https://7468-thomaswhyne146-e5205b-1257892934.tcb.qcloud.la/sprite-img (1).png?sign=83c303893c78a10d967ca82b723daf02&t=1545012890")
+        background-size:1329rpx 1110rpx;
+        background-position-x:56%;
+        background-position-y:25%;
+        left:-78%;
+        top:43%;
+        z-index:2
+    .cup
+        position absolute
+        left 34%
+        top 105%
+        transition top 1s linear 
+        width 270rpx
+        height 555rpx
+        transform scale3d(1.3,1.3,1.3)
+        background-image url(https://7468-thomaswhyne146-e5205b-1257892934.tcb.qcloud.la/cup_spr.png?sign=80530da91f5ffd846d5d6edf91972ddb&t=1545008723)
+        background-size auto 555rpx
+        background-repeat no-repeat
+        animation-name cupSpr
+        animation-duration: 1.5s;
+        animation-timing-function: steps(15, end);
+        animation-direction normal
+        animation-iteration-count: infinite;
+    .loginbar
+        opacity 0
+        transition opacity .4s
+        transition-delay 2.2s
+        position:relative;
+        top:-27%;
+        width:40%;
+        height:68rpx;
+        color:#fff;
+        font-size:40rpx;
+        letter-spacing:4rpx;
+        text-align:center;
+        line-height:68rpx;
+        border-radius:15rpx;
+        z-index 200
+        box-shadow 1rpx 1rpx 1rpx 1rpx rgba(0,0,0,0.26),1rpx 1rpx 1rpx 1rpx rgba(0,0,0,0.26)
+        background-color rgba(255,255,255,0.1)
+        &:active
+            background-color red
+        &::after
+            content ''
+            position absolute
+            top 0
+            left 0
+            bottom 0
+            right 0 
+            filter blur(1rpx)
+            border-radius 15rpx
+            z-index -1
+        &::before
+            content ''
+            position absolute
+            top 0
+            left 0
+            right 0
+            bottom 0
+            z-index 1
+            pointer-events none
+            background-image radial-gradient(circle,#666)
+            background-repeat no-repeat
+            background-position 50%
+            transform scale(10,10)
+            opacity 0
+            transition transform .3s, opacity .5s
+        &:active::after 
+            transform scale(1)
+            opacity .3
+            transition 0s
+        text 
+            color #ba9a6c
+            padding-left 5rpx
+    @keyframes cupSpr {
+        to {
+            background-position 100% 0px
+        } 
+    }
+    @keyframes cupIn {
+        100%{
+            top 32%    
+        }
+    }
+
+</style>
+
+<template>
+    <view class="bg {{statusIn?'status--in':''}}">
+        <image class="logo" src="./../assets/head-logo.png"  mode="aspectFit"/>
+        <image class="bg-main" src="./../assets/bgnew (2).jpg" mode="aspectFill"/>
+        <view class="description" @transitionend="showLoginButton"></view>
+        <view class="cup" ></view>
+        <button wx:if="{{auth===0}}" @tap="getUserData" class="loginbar"><text>{{opening}}</text></button>
+        <button wx:if="{{auth===1}}" class="loginbar" @tap="toIndex">{{opening}}</button>
+
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import { _cloudLog } from "@/utils/cloudAsync";
+export default class Login extends wepy.page {
+    data={
+        statusIn:false,
+        loginShow:false,
+        auth:0,
+        loading:false,
+        opening:''
+    }
+    methods={
+        showLoginButton(){
+            this.loginShow=true;
+        },
+        toIndex(){
+            this.$preload(userData);
+            this.$redirect("./index");
+        },
+        getUserData(){
+            this.loading=true;
+            wx.login({
+                success:({code})=>{
+                    _cloudLog(code,this.setRoute);
+                }
+            })
+        }
+    }
+    computed={
+
+    }
+    watch={
+        loading(nval){
+            if(nval){
+                wx.showLoading({
+                    title:"登录中"
+                })
+            }else{
+                wx.showLoading({
+                    title:"登录成功"
+                })
+                setTimeout(() => {
+                    wx.hideLoading({})
+                }, 500);
+            }
+        }
+    }
+    setRoute=(userData)=>{
+        wx.setStorageSync("userData",userData);
+        this.$preload(userData);
+        this.$redirect("./index",{user_id:userData.uuid})
+        this.loading=false;
+    }
+    logValid(){
+        this.loading=true;
+            const userData=wx.getStorageSync("userData");
+            const page=this;
+            console.log("preparing checking session")
+            wx.checkSession({
+                seccess:function(){
+                    console.log("session successed")
+                    page.$preload(userData);
+                    page.$redirect("./index",{user_id:userData.uuid})
+                },
+                fail:function(){
+                    console.log("session failed")
+                    wx.removeStorageSync("userData")
+                    wx.login({
+                        success:({code})=>{
+                            _cloudLog(code,this.setRoute)
+                        }
+                    })
+                },
+                complete:function(){
+                    console.log("session completed");
+                    page.$preload(userData);
+                    page.$redirect("./index",{user_id:userData.uuid})
+                }
+            })
+    }
+    onReady(){
+        this.statusIn=true;
+    }
+    onLoad(){
+        if(wx.getStorageSync('userData')){
+            this.logValid();
+        }else{
+            this.auth=0;
+            this.opening="登录";
+        }
+    }
+}
+</script>
+
+

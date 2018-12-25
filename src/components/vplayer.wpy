@@ -61,7 +61,7 @@ export default class Vplayer extends wepy.component {
         },
         v_cover:{
             type:String,
-            default:''
+            default:"https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3610728189,4277470435&fm=173&app=25&f=JPEG?w=640&h=360&s=F2BA75CA8EA49B6654791619030080D4"
         },
         v_duration:{
             type:String,

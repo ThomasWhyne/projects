@@ -1,0 +1,109 @@
+<style lang="stylus">
+    .containe
+        margin-top 50rpx
+    .reply-footer
+        position fixed
+        width 100%
+        bottom 0
+    
+</style>
+
+<template>
+    <refresher>
+    </refresher>
+        <topper :topNum.sync="hotNum" :midNum.sync="newNum">
+            <!-- :topText :midText -->
+                <view slot="hottest">
+                <hotcomment :comment_list.sync="comment_list" :showReply="showReply" ></hotcomment>
+            </view>
+            <view slot="newest">
+                <newcomment :comment_list.sync="newComments" :showReply="showReply"></newcomment>
+            </view>
+        </topper>
+    <view class="reply-footer">
+        <inputer></inputer>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import CommentMix from "@/mixins/commentMix";
+import Topper from "@/components/topper";
+import Refresher from "@/components/refresher"
+import Comment from "@/components/comment";
+import Inputer from "@/components/inputer";
+import { _commentRetrive,_updateLiked} from "@/utils/cloudAsync";
+const fnArray=["setUserFavors","setUserLiked"];
+const cloud=wx.cloud.callFunction;
+export default class Reply extends wepy.page {
+    mixins=[CommentMix]
+    data={
+        comment_list: [],
+        bufferArray: [],
+        newComments:[],
+        showReply:true,
+        user_id:'',
+        article_id:''
+    }
+    methods={
+        onPageScroll(){
+            this.$broadcast("pageScrolling");
+        }
+    }
+    events={
+        "onPageRefresh":(name,call)=>{
+            ((name,call)=>setTimeout(()=>{
+                    this.$invoke(name,call);
+                },2000))(name,call)
+        },
+        "brifeTaped":(comment_id,index)=>{
+            let comment=this.comment_list[index];
+            this.$preload("comment",comment);
+            this.$navigate("./singleReply",{comment_id,user_id:this.user_id});
+        }
+    }
+    computed={
+        hotNum(){
+            return this.comment_list.length;
+        },
+        newNum(){
+            return this.newComments.length;
+        }
+    }
+    initMixin(){
+        this.$mixins.map(m=>m.page=this);
+    }
+    onUnload(){
+        
+    }
+    onReady(){
+         _commentRetrive({ 
+             article_id: this.article_id,
+              user_id: this.user_id, 
+              depth: 0, 
+              orderKey:"timestamp",
+              limit:10
+              }, ({comments})=>{
+                  this.newComments=comments;
+                  this.$apply();
+              })
+    }
+    onLoad(params,data){
+        this.user_id=params.user_id;
+        this.article_id=params.article_id;
+       let { comments }=data.preload;
+        this.comment_list=comments;
+       this.initMixin();
+    }
+    components={
+        refresher:Refresher,
+        hotcomment:Comment,
+        newcomment:Comment,
+        topper:Topper,
+         inputer:Inputer
+    }
+    config={
+
+    }
+}
+</script>

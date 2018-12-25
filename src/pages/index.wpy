@@ -9,6 +9,9 @@
         display none
     .container-content
         overflow scroll
+    .container__section-article--lastviewd
+        opacity 0.7
+        color #97a9ac !important
     .container__section-article
         height 180rpx
         display flex
@@ -19,6 +22,7 @@
     .container__article--title
         margin 30rpx
         font-size 30rpx
+        
     .container__article--desc
         margin-top 25rpx
         margin-left 30rpx
@@ -43,13 +47,13 @@
     .container__video--vtitle
         margin 2.5%
         font-size 30rpx
+        
     .container__video--vbody
         position relative
         width 95%
         height 70%
         left 2.5%
         border-radius 5rpx
-        background-color red
     .container__video--vdesc
         width 90%
         margin 2.5% 0 2.5% 2.5%
@@ -76,12 +80,17 @@
             flex 1
             white-space nowrap
     .container__section--activity__title
-        height 25%
+        height 20%
         display flex
         align-items center
+        font-size 30rpx
         justify-content space-between
-        background-color teal
         padding 0 29rpx
+    .container__section--activity__count
+        font-size 25rpx
+        color #97a9ac
+        image
+            margin-left 10rpx
     .container__section--activity__scroller
         display inline-block
         margin 29rpx 0 0 29rpx
@@ -93,6 +102,17 @@
             background-color red
     .container__section--activity__scroller-name
         color #34474a
+        font-size 30rpx
+        margin-bottom 25rpx
+    .container__section--activity__scroller-time
+        height 35rpx
+        color #ffffff
+        font-size 20rpx
+        text-align center
+        line-height 35rpx
+        background-color #385c5c
+        padding 8rpx
+        border-radius 10rpx
     .container__footer
         text-align center
         height 75rpx
@@ -104,7 +124,7 @@
 </style>
 
 <template>
-    <container :shift.sync="shift">
+    <container :shift.sync="shift" :userData.sync="userData">
         <view slot="container">
             <view class="container-nav">
                 <navbar :tabList="tabList" :currentTab.sync="currentTab"></navbar>
@@ -119,8 +139,8 @@
                                 <banner :bannerList="bannerList"></banner>
                             </view>
                             <view class="container__section">
-                                <block wx:for="{{recommand_list}}" wx:key="index">
-                                    <view class='container__section-article' @tap="toArticleDetail({{item.article_id}})">
+                                    <block wx:for="{{recommand_list}}" wx:key="index">
+                                    <view class="container__section-article {{index===lastIndex?'container__section-article--lastviewd':''}}" id="{{index===0?'frist':''}}" @tap="toArticleDetail({{item.article_id}})">
                                             <view class='container__article--header'>
                                                 <view class='container__article--title'>{{item.title}}</view>
                                                 <view class='container__article--desc'>
@@ -131,6 +151,7 @@
                                                 <image src='{{item.image_url_small}}' mode=" aspectFill" lazy-load="{{true}}"></image>
                                             </view>
                                     </view>
+                                    <view wx:if="{{index===lastIndex&&index>=5}}" class="container__footer" @tap="onMiddleTap({{index}})">看到此处，点击刷新  </view>
                                     <!-- 视频播放组件放置区 -->
                                         <block wx:if="{{index==4}}">
                                             <view class='container__section-video'>
@@ -144,7 +165,7 @@
                                                         <text>2.7万播放</text>
                                                     </view>
                                                     <view class='container__vdesc-switch'>
-                                                        <text></text>
+                                                        <image src="./../assets/loading_next.png" style="height:21rpx;width:21rpx;" mode="aspectFill"/>                     
                                                         <text>换一个</text>
                                                     </view>
                                                 </view> 
@@ -155,23 +176,28 @@
                                         <block wx:if="{{index==7}}">
                                             <view class='container__section-activity'>
                                                 <view class='container__section--activity__title'>
-                                                <view><text>活动中心</text></view>
-                                                <view><text>10个</text><text>》</text></view>
+                                                <view>
+                                                    <text>活动中心</text>
+                                                </view>
+                                                <view class="container__section--activity__count">
+                                                    <text>10个</text>
+                                                    <image src="./../assets/arrow_right_light.png" style="width:12rpx;height:21rpx;" />
+                                                </view>
                                                 </view>
                                                 <scroll-view scroll-x>
                                                     <view class='container__section--activity__scroller'>
-                                                        <image></image>
+                                                        <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1544917736943&di=1c5eef8aaf135cca797a796bde4bd54c&imgtype=0&src=http%3A%2F%2Fimg.yxbao.com%2Farticle%2Fimage%2F201811%2F05%2F1de2d61544.jpg"></image>
                                                         <view class='container__section--activity__scroller-name'><text>K/DA最新资讯</text></view>
                                                         <view class='container__section--activity__scroller-time'><text>5天后结束</text></view>
                                                     </view>
                                                     <view class='container__section--activity__scroller'>
-                                                        <image></image>
-                                                        <view class='container__section--activity__scroller-name'><text>K/DA最新资讯</text></view>
-                                                        <view class='container__section--activity__scroller-time'><text>5天后结束</text></view>
+                                                        <image src="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1407210642,4106930002&fm=173&app=25&f=JPEG?w=640&h=341&s=528361A4C6B2B3F35C7A7F940300D09C"></image>
+                                                        <view class='container__section--activity__scroller-name'><text>IG冠军庆典之月</text></view>
+                                                        <view class='container__section--activity__scroller-time'><text>29天后结束</text></view>
                                                     </view>
                                                     <view class='container__section--activity__scroller'>
-                                                        <image></image>
-                                                        <view class='container__section--activity__scroller-name'><text>K/DA最新资讯</text></view>
+                                                        <image src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1544917676046&di=62f2907227f85654c57faab57aceb900&imgtype=0&src=http%3A%2F%2F08imgmini.eastday.com%2Fmobile%2F20181125%2F20181125032305_b913dd5c0a3d0563adb33f4b2121ad38_1_mwpm_05501609.jpg" ></image>
+                                                        <view class='container__section--activity__scroller-name'><text>K/DA 卡莎 至臻</text></view>
                                                         <view class='container__section--activity__scroller-time'><text>5天后结束</text></view>
                                                     </view>
                                                 </scroll-view>
@@ -201,11 +227,28 @@ wx.cloud.init();
 const db=wx.cloud.database();
 const recommand_list=db.collection('recommand_list');
 const user_list=db.collection("user_list");
+const fn={
+            bottom(list,data){
+                return [...data,...list];
+            },
+            middle(list,data){
+                list.splice(this.lastIndex,0,...data);
+                return list;
+            },
+            default(list,data){
+                return[...list,...data];
+            }
+        }
 export default class Index extends wepy.page {
     config={
     }
     data={
+        page:0,
         shift:false,
+        userData:{},
+        user_id:'',
+        lastIndex:NaN,
+        toView:"",
         tabList:[{ key: 'tab1', title: '推荐',desc:'recom' },
             { key: 'tab2', title: '赛事', desc: 'match' },
             { key: 'tab3', title: '视频', desc: 'video' },
@@ -319,12 +362,26 @@ export default class Index extends wepy.page {
             let user_id=this.user_id;
             this.$preload("history",view);
             this.$navigate("./detail",{article_id,user_id});
+        },
+        onMiddleTap(index){
+        //  wx.createSelectorQuery().selectAll("#contentWrapper").boundingClientRect(res=>{
+                
+        //     }).exec()
+        this.toView="frist";
+            this.$apply();
+            this.$broadcast("middleTapped");
         }
     }
     events={
-        "onPageRefresh":(name,call)=>{
+        "onPageRefresh":(name,call,type)=>{
+            this.dataRefresh(type);
             ((name,call)=>setTimeout(()=>{
                     this.$invoke(name,call);
+                    wx.showToast({
+                        image:"./../assets/polo.gif",
+                        duration:500,
+                        title:`更新了10信息`,
+                    })
                 },2000))(name,call)
         },
         'togglePageShift':()=>{
@@ -342,19 +399,40 @@ export default class Index extends wepy.page {
         this.currentIndex=index;
         this.$apply();
     }
-    async onReady(){
-
+    async dataRefresh(type="default"){
+        this.page+=1;
+        const { data }=await recommand_list.skip(this.page*10).limit(10).get();
+        const list=this.recommand_list;
+        this.recommand_list=fn[type].call(this,list,data);
+        this.checkView()
+        this.$apply();
     }
-    async onLoad(){
+    checkView(){
+        setTimeout(() => {
+                const views=_queryViews();
+            if(views.length){
+                console.log(views);
+                const view=views.pop();
+                this.lastIndex=this.recommand_list.findIndex(item=>item.doc_id==view.doc_id);
+                this.$apply();
+            }
+            },500);
+    }
+    onShow(){
+            this.checkView();
+    }
+    async onReady(){
+        
+    }
+    async onLoad(options,params){
+        console.log(options);
+        const {user_id}=options;
+        const { preload:userData }=params;
+        this.user_id=user_id;
+        this.userData=userData;
         let { data }=await recommand_list.limit(10).get();
         this.recommand_list=data;
         this.$apply();
-        this.user_id=this.$parent.globalData.uuid;
-        // .then(res=>{
-        //     this.recommand_list=res.data;
-        //     this.$apply();
-        //     console.log(this.recommand_list)
-        //  })
     }
 }
 </script>

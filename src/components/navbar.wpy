@@ -82,7 +82,7 @@
     <view class="navbar">
         <view class="navbar-avatar" @tap="onTriggerSlide">
             <view class="navbar-avatar__thumb">
-                <image></image>
+                <image src="https://q4.qlogo.cn/g?b=qq&k=oJrFtCuotoicerMypMmurIQ&s=140&t=1439899557"></image>
             </view>
         </view>
         <scroll-view wx:if="{{scrollable}}" scroll-x="true" class="navbar-tab navbar-tab--scroll">
@@ -95,7 +95,12 @@
         <view wx:else class="navbar-tab">
             <block wx:for="{{ tabList }}" wx:key="key">
                 <view class="navbar-tab__tabs {{currentTab==item.key?'navbar-tab__tabs--current':''}}">
-                    <text @tap="onTabChange({{item.key}})" data-key="{{item.key}}">{{item.title}}</text>
+                    <block wx:if="{{!imageNav}}">
+                        <text @tap="onTabChange({{item.key}})" data-key="{{item.key}}">{{item.title}}</text>
+                    </block>
+                    <block wx:else>
+                        <image  @tap="onTabChange({{item.key}})" data-key="{{item.key}}" src="{{item.title}}"/>
+                    </block>
                 </view>
             </block>
         </view>
@@ -118,6 +123,10 @@ export default class Navbar extends wepy.component {
         currentTab:{
             type:String,
             default:"tab1"
+        },
+        imageNav:{
+            type:Boolean,
+            default:false
         }
     }
 

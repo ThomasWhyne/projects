@@ -1,0 +1,231 @@
+<style lang="stylus">
+    message='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAArCAMAAAA0X5qLAAAAV1BMVEUAAADatoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratoratorcXTJOAAAAHHRSTlMACwa25OswJcOBdG5Fva/oKyGsW9O+phiXZlQ/YxO3rgAAAM9JREFUOMvV1dsKgzAMBuBU7WGendOd8v7PuZiCU7TYXM39oCTwIaG2FE6VCx5HYlFi8WuvB3Mynm0kZivA8MfYpGopVGrC2Gh0amEdahPCraayUrOtqNXtPrYNTkkT4CQpt43dwzajovDaW99mdou7yZaQ07tOyNZU5FBOutvggS2wLgAKtsB6EH1ZMrNkNSTrLPmDkr1x/v38U7yO64HyHjNcZ4s5pF9cxGAHPe4kMN2TntsdDsPY22jsFETjKtKCP1fReCQbix+SWw6C+QB0hTqzSSGtrQAAAABJRU5ErkJggg=='
+    subscribe='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAb1BMVEUAAAC6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmy6mmwO6okDAAAAJHRSTlMACMemgA01taw6VS+Gn3Mq89fPwHhDHxbrjSXimFxNua/JfGKQG85AAAABvklEQVRIx62WbXeCMAyFgZZaQFAEhyi+bLv//zeuBjDHYZCeLV88hj659LbJIfjH2CfeSLXyJRLAeCJXwFPGwEXmhazuiPUhMlBsPBALdBGglhObu8Jd6bgYUUAUBD4yx94t4yGTkwjJ5MuID9DJ9zIfi5CORAaZbqlIMly0ZTLNuJNxN428NjapVtEWvQjLYLtT63PyRIabS9FVJzyi5WctZ7eR0mcTu6SmtRwHu39qTnv49XwdxNFY5dNSlUnEWVrn0UhWoctUAIrkrTOxKQBcQ9oLMe+9rAGsiFjKfA3EwFwB1POEZqJn7o37NUesAdxGghk9T9ieYObmkus5Qo0EM1Zm2oGYMEryoB4IgXl1+i6dTwj24DJNX8hdebKcp9l0btLsgOzlVCslIgQQCml5fpXvxKcvbYUJnco3T7O1bHct3wvF1fY7YLdnl2/vDDNDc0cJWzZr2LGlUbAlKBMt42KNJoGuaYhE64bCJ2BEw8KC1qkjjdqc/ujG/Z5Fw2j0XM1D+EbvKFpmhz0/jb6koqTwEVDCRcmHxn67OEmGnb5fOZOW1EjTyHAopEb6PiF5kb9oKiRARRr8IX4A5JY70HYKcqMAAAAASUVORK5CYII='
+    input_face='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAS1BMVEUAAABQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJQbnJC80wIAAAAGHRSTlMA8Q2GA7tHsmluI1IX5tBY1zbfqZl4jMTjBSxqAAABlklEQVQ4y51VW7aDIAwk+ECoVK22zf5XeglcDEhbjuarByfTCZMEcQjZN2oGF7Nqeil+Rb8CJgFr/xV6u0eQtTHpfvsINZ3HKb1Ir2fRymd0psRO9OUxZDLl8KD86Yht6HRoj8ftQBxNfrjR/42f1I2kbjvyvpg2J3/l3BMiPsXXeCLirttAIasoCOKddE5v+wvcEuLfC5c3ip8xAmJwx/k2iEoMzkvfD86LbyLMLsS5Q32yJsRSv/qssJWp6bcEBBnz3xgy+fYjt4eRCrW3nW+lqOmZmaGcDkrXKRWTOZlvlqRdJmUsbBXFyKkJ80IKZkSZWoldpnmvVyLOwglPZgXwbdLbmNktAgLa1FiZz2TirI3gWjAYajCWwQVSjPkMev1cYLg6dsUmaGnxll9dMIVHkT6zoVtuSrCbT2DZuSDwsN2xkXhoQLdxCbBBEUYtygXSBrOb1ptFDJZwixbNLxXuoaTImp/HqliP96kYq08DayatJ1MM7JlVcGrJnFlf1xZjfeVeX+b1Z+L6A1R/2q4/mvXn+A/3JSc//3tP9AAAAABJRU5ErkJggg=='
+    keyboard='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsAQMAAAAkSshCAAAABlBMVEUAAABQbnKMrsFGAAAAAXRSTlMAQObYZgAAAC9JREFUGNNjIB78B4EPaNQDPuaGBwXEU2B9GNQDhgcWDCRQONwCcmUBQQqXdqIBABLWcSf1J+iaAAAAAElFTkSuQmCC'
+    .mask
+        position fixed
+        top 0
+        right 0
+        bottom 0
+        width 100%
+        background-color rgba(0,0,0,.6)
+        z-index 1
+    .inputer
+        height 48rpx
+        padding:8rpx 8rpx 30rpx  0;
+        background-color #fff
+        box-shadow 0px -1px 2px 0px rgba(0, 0, 0, 0.14)
+    .inputer-label
+        margin-top 10rpx
+        margin-left 25rpx
+        display flex   
+        justify-content space-around
+        align-items center
+    .inputer-label__comments
+    .inputer-label__subscribe
+    .inputer-area__emoji
+        background-size contain
+        background-position center
+        background-repeat no-repeat  
+        width 38rpx
+        height 38rpx
+        margin-left 10rpx
+    .inputer-label__comments
+        background-image url(message)
+    .inputer-label__subscribe
+        background-image url(subscribe)
+    .inputer-label__palceholder
+        width 85%
+        padding-left 20rpx
+        margin-right 10rpx
+        border-radius 8rpx
+        background-color #e3e3e3
+        line-height 2
+        font-size 25rpx
+    .inputer-area
+        position fixed
+        width 100%
+        bottom 0
+        padding-left  25rpx
+        transition all .4s 
+        transform translate3d(0,150%,0)
+        z-index 2
+        background-color #fff
+    .inputer-area--up
+        transform translate3d(0,0,0)!important
+    .inputer-area__text
+        position relative
+        width 94%
+        margin-top 25rpx
+        height 200rpx
+    textarea
+        width 93.5%
+        height 150rpx
+        font-size 30rpx
+        padding 25rpx
+        border-radius 8rpx
+        background-color #e3e3e3
+    .inputer-area__sticker
+        position relative
+        width 90rpx
+        height 90rpx
+        left 85%
+        z-index 500
+        transform translate3d(0,-180rpx,0)
+    .inputer-area__delete
+        height 30rpx
+        width 30rpx
+        border-radius 30rpx
+        position absolute
+        right 0
+        top 0
+        z-index 200
+        background-color aqua
+    cover-image
+        width 78rpx
+        height 78rpx
+        position absolute
+        bottom 0
+    .inputer-area__btnsection
+        height 68rpx
+        width 94%
+        display flex
+        align-items center
+        justify-content space-between
+        background-color #fff
+    .inputer-area__emoji
+        margin-left 0
+        background-image url(input_face)
+    .inputer-area__keyboard
+        background-image url(keyboard)
+    .inputer-area__post
+        height 38rpx
+        width 100rpx
+        border 1rpx solid #bea26d
+        font-size 28rpx
+        border-radius 5rpx
+        text-align center
+        line-height 38rpx
+        color #bea26d
+        &:active
+            opacity .7
+            background-color #bea26d
+     .inputer-area__emsection
+        width 94%
+</style>
+
+<template>
+    <view class="mask" hidden="{{!isInputing}}" @tap="onMaskTap"></view>
+    <view class="inputer">
+        <view class="inputer-label">
+            <view class="inputer-label__palceholder" @tap="onPullInput"><text>我也来说点什么...</text></view>
+            <text  class="inputer-label__comments"></text>
+            <text  class="inputer-label__subscribe"></text>
+        </view>
+        <view class="inputer-area {{isInputing?'inputer-area--up':''}}">
+            <view class="inputer-area__text">
+                <textarea type="text" value="{{text}}" focus="{{focus}}"  @blur="onTextArea" />
+                <cover-view class="inputer-area__sticker" @tap="deleteSticker" hidden="{{isSelected}}">
+                    <cover-image class="inputer-area__delete" src="./../assets/search_clear_press.png"/>
+                    <cover-image src="{{sticker_src}}"></cover-image>
+                </cover-view>
+            </view>
+            <view class="inputer-area__btnsection">
+                <text class="inputer-area__emoji {{hideEmoji?'':'inputer-area__keyboard'}}" @tap="insertEmoji"></text>
+                <text class="inputer-area__post" @tap="onPostTap">发表</text>
+            </view>
+            <view class="inputer-area__emsection" hidden="{{hideEmoji}}">
+                <sticker></sticker>
+            </view>
+        </view>
+        </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import Sticker from "./sticker";
+export default class Inputer extends wepy.component  {
+   
+    props={
+        isInputing:{
+            type:Boolean,
+            default:false
+        }
+    }
+    data={
+        text:"",
+        focus:false,
+        hideEmoji:true,
+        isSelected:true,
+        sticker_src:""
+    }
+    methods={
+        onPullInput(){
+            this.toggleInputting()
+        },
+        onTextArea(e){
+            let {value}=e.detail;
+            this.text=value;
+            
+        },
+        insertEmoji(){
+            this.hideEmoji=!this.hideEmoji;
+        },
+        onMaskTap(){
+            this.toggleInputting();
+        },
+        deleteSticker(){
+            this.isSelected=true;
+            this.sticker_src="";
+            this.$apply();
+        },
+        onPostTap(){
+            if(!this.text.trim() || this.text.length<=6)return wx.showToast({
+                title:"请再多说点吧",
+                image:"./../assets/unsupport_tip.png",
+                duration:2000
+            })
+            const data={
+                ...this.prepare,
+                sticker:this.sticker_src,
+                content:this.text
+            }
+            this.$emit("postPrepared",data);
+        }
+    }
+    events={
+        "concatEmoji":(emoji)=>{
+            this.text+=emoji;
+        },
+        "stickerSelected":(sticker_src)=>{
+            this.sticker_src=sticker_src;
+            this.isSelected=false;
+            this.$apply();
+        },
+        "triggerInput":(trigger)=>{
+            this.toggleInputting(trigger);
+        },
+        "clearInput":()=>{
+            this.isInputing=false;
+            this.focus=false;
+            this.prepare='';
+        }
+    }
+    toggleInputting(trigger){
+        this.isInputing=!this.isInputing;
+        this.focus=!this.focus;
+        const userData=wx.getStorageSync("userData");
+        this.prepare=trigger?{...trigger,userData}:{userData};
+        this.$apply();
+    }
+    components={
+        sticker:Sticker
+    }
+}
+</script>
+
+
+
+
+

@@ -1,5 +1,7 @@
 const _queryViews=(doc_id)=>{
-    let [view] = wx.getStorageSync('views').filter(view => view.doc_id == doc_id);
+    const views = wx.getStorageSync('views');
+    if(!doc_id)return views;
+    let [view] = views.filter(view => view.doc_id == doc_id);
     return view;
 }
 

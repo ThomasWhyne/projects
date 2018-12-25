@@ -1,0 +1,88 @@
+<style lang="stylus">
+    .topper-header__hot
+    .topper-header__new
+        width 100%
+        height 50rpx
+        background-color #e4e4e4
+        padding-left 30rpx
+        font-size 23rpx
+        line-height 50rpx
+        color #889191
+        z-index 500
+    .topper-header__hot
+        position fixed
+    .topper-header__new--shallpause
+        position fixed
+        top 0
+    .topper-bd_hot
+    .topper-bd__new
+        position relative
+        margin-bottom 50rpx
+        overflow hidden
+        
+
+</style>
+<template>
+    <view class="topper-header__hot" style="height:{{height}}px;line-height:{{height}}px;{{topShift}}">最热评论({{topNum}})</view>
+    <view class="topper">
+        <view class="topper-bd_hot" id="hotwrapper" style="top:{{height}}px;">
+            <view class="topper-bd__main">
+                <slot  name="hottest"></slot>
+            </view>
+        </view>
+        <view class="topper-header__new {{collapsed?'topper-header__new--shallpause':''}}" style="height:{{height}}px;line-height:{{height}}px;">最新评论({{midNum}})</view>
+        <view class="topper-bd__new" id="newrapper" >
+            <slot name="newest"></slot>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+const defaultShift="top:0;";
+export default class Topper extends wepy.component {
+    props={
+        topNum:{
+            type:Number,
+            default:0
+        },
+        midNum:{
+            type:Number,
+            default:0
+        },
+        height:{
+            type:Number,
+            default:23
+        }
+    }
+    data={
+        wrapperRect:0,
+        collapsed:false,
+        topShift:'',
+        midShift:'',
+        rect:0
+    }
+    methods={
+    }
+    events={
+        "pageScrolling":()=>{
+            wx.createSelectorQuery().select("#newrapper").boundingClientRect(res=>{
+                if(res.top<=this.height && res.top>=-this.height)this.rect=res.top;
+            }).exec()
+        }
+    }
+    watch={
+        rect(nval,oval){
+            if(!this.collapsed && nval<=oval){
+                this.topShift=`transform:translate3d(0,${-this.height}px,0);`;
+                this.collapsed=true;
+            }else if(this.collapsed && nval>=oval){
+                this.topShift='';
+                this.collapsed=false;
+            }
+        }
+    }
+}
+</script>
+
+

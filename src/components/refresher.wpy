@@ -161,11 +161,9 @@ export default class Refresher extends wepy.component {
             this.shifY=Math.pow(this.shifY,0.8);
             if(!this.activated && this.shifY > this.distance){
                 this.activated=true;
-                //this.$emit('cuntomevent');
             }else if(this.activate && this.shifY < this.distance){
                 this.activated=false;
             }
-
             this.igniteShift(this.shifY);
         },
         onTouchEnd(e){
@@ -174,8 +172,18 @@ export default class Refresher extends wepy.component {
             this.deactivate(e);
             if(Math.abs(this.shifY)>=this.distance){
                 this.igniteRefresh();
-                this.$emit('onPageRefresh',this.$name,'terminateRefresh');
+                this.$emit('onPageRefresh',this.$name,'terminateRefresh',"default");
             }
+        }
+    }
+    events={
+        "bottomHitted":()=>{
+            this.igniteRefresh();
+            this.$emit('onPageRefresh',this.$name,'terminateRefresh',"bottom");
+        },
+        "middleTapped":()=>{
+            this.igniteRefresh();
+            this.$emit('onPageRefresh',this.$name,'terminateRefresh',"middle");
         }
     }
     getTouchPostion(e){
